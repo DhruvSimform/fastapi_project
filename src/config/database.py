@@ -10,8 +10,9 @@ engine = create_engine(DATABASE_URL, echo=True)
 
 Base = declarative_base()
 
+SessionLocal = sessionmaker(bind=engine, autoflush=False, autocommit=False)
+
 
 def get_db():
-    SessionLocal = sessionmaker(bind=engine)
     with SessionLocal() as db:
         yield db
