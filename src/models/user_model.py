@@ -1,12 +1,12 @@
 import uuid
-from config.database import Base
+from ..config.database import Base
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 from sqlalchemy import String , Column , DateTime
 from datetime import datetime
 
 class User(Base):
-    __tablelname__ = "users"
+    __tablename__ = "users"
 
     id = Column(UUID( as_uuid=True),
                  primary_key=True,

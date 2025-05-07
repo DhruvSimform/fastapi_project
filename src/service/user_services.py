@@ -1,15 +1,30 @@
 from typing import List
 
-from fastapi import HTTPException
+from fastapi import HTTPException , status
 from pydantic import UUID4
 from sqlalchemy.orm import Session
-from repository.user_repository import UserRepository
-from schemas.user_schema import UserInput,UserOutput
+from ..repository.user_repository import UserRepository
+from ..schemas.user_schema import UserInput,UserOutput
 
 class UserServvice:
     def __init__(self,db: Session):
         self.repository = UserRepository(db)
     
     def create(self, data: UserInput) -> UserOutput:
+        if self.repository.user_exists_by_username(data.username):
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST , detail="User aleredy exists with this db")
+        return self.repository.create(data)
+    
+    def get_all(self) -> list[UserOutput] | None:
+        return self.repository.get_all()
+    
+    def get(self, _id: UUID4) -> UserOutput:
+        return self.repository.get_user(_id)
+    
+    def delete(self, _id: UUID4) -> bool:
+        if not self.repository.user_exists_by_id(_id):
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND , detail="User not exists")
+    
+    def updae():
         pass
 

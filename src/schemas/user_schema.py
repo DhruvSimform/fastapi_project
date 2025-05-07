@@ -22,3 +22,7 @@ class UserOutput(User):
     username: str
     email: EmailStr
 
+class UpdateUser(User):
+    username: str | None = None
+    email: EmailStr | None = None
+    password: str | None = None
