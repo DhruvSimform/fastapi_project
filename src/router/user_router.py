@@ -3,7 +3,7 @@ from pydantic import UUID4
 from sqlalchemy.orm import Session
 from ..schemas.user_schema import UserInput,UserOutput 
 from ..schemas.auth_schema import Token
-from ..service.user_services import UserServvice
+from ..service.users_services import UserServvice
 from typing import Annotated
 from ..dependencies import get_db , get_current_user_and_db
 

@@ -42,9 +42,3 @@ class UserRepository:
         self.db.delete(user)
         self.db.commit()
         return True
-
-    def authenticate_user(self, data: UserLogin) -> UserOutput | bool:
-        user = self.db.query(User).filter_by(username=data.username).first()
-        if not user or not verify_password(data.password, user.hash_password):
-            return False
-        return user

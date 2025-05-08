@@ -1,4 +1,4 @@
-from ..repository.user_repository import UserRepository
+from ..repository.users_repository import UserRepository
 from fastapi import Depends  , HTTPException , status
 from typing import Annotated
 from ..utils.auth import verify_token
@@ -7,7 +7,7 @@ from ..schemas.auth_schema import Token
 from ..schemas.user_schema import UserOutput
 from ..config.database import get_db
 from sqlalchemy.orm import Session
-from ..service.user_services import UserServvice
+from ..service.users_services import UserServvice
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/token")
 
