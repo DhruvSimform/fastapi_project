@@ -2,7 +2,7 @@ from fastapi import APIRouter , Depends , status , Form
 from pydantic import UUID4
 from sqlalchemy.orm import Session
 from ..schemas.user_schema import UserInput,UserOutput , UserLogin
-from ..schemas.auth_schema import Token
+from ..schemas.auth_schema import Token , RefreshToken
 from ..service.user_services import UserServvice
 from typing import Annotated
 from fastapi.security import OAuth2PasswordBearer
@@ -26,5 +26,7 @@ def login_user(data: Annotated[UserLogin , Form()] , db: DB_Depndancy):
 
 
 @router.post("/refresh-token" , response_model=Token , status_code=status.HTTP_200_OK)
-def refresh_access_token(refresh_token:str):
-    pass
+def refresh_access_token(token:RefreshToken):
+    return UserServvice.genrate_new_access_token(token.refresh_token)
+
+    

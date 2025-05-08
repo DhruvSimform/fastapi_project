@@ -3,7 +3,7 @@ from pydantic import UUID4
 from sqlalchemy.orm import Session
 from ..repository.user_repository import UserRepository
 from ..schemas.user_schema import UserInput,UserOutput , UserLogin
-from ..schemas.auth_schema import Token
+from ..schemas.auth_schema import Token , RefreshToken
 from ..utils.auth import create_access_token , create_refresh_token , verify_token
 from fastapi.security import OAuth2PasswordBearer
 
@@ -41,6 +41,7 @@ class UserServvice:
             )
 
         # Use a unique and serializable field in JWT payload
+
         access_token = create_access_token(data={"sub": user.username})
         refresh_token = create_refresh_token(data={"sub": user.username})
 
@@ -49,3 +50,19 @@ class UserServvice:
             refresh_token=refresh_token,
             token_type="Bearer"
         )
+    
+    @staticmethod
+    def genrate_new_access_token(_token: RefreshToken):
+        payload = verify_token(token=_token)
+
+        access_token = create_access_token(data=payload)
+        refresh_token = create_refresh_token(data=payload)
+
+        return Token(
+            access_token=access_token,
+            refresh_token=refresh_token,
+            token_type="Bearer"
+        )
+        
+
+
