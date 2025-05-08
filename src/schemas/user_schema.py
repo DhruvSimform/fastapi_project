@@ -26,3 +26,8 @@ class UpdateUser(User):
     username: str | None = None
     email: EmailStr | None = None
     password: str | None = None
+
+
+class UserLogin(User):
+    username: str
+    password: str

@@ -1,10 +1,11 @@
-from typing import List
-
-from fastapi import HTTPException , status
+from fastapi import HTTPException , status , Depends
 from pydantic import UUID4
 from sqlalchemy.orm import Session
 from ..repository.user_repository import UserRepository
-from ..schemas.user_schema import UserInput,UserOutput
+from ..schemas.user_schema import UserInput,UserOutput , UserLogin
+from ..schemas.auth_schema import Token
+from ..utils.auth import create_access_token , create_refresh_token , verify_token
+from fastapi.security import OAuth2PasswordBearer
 
 class UserServvice:
     def __init__(self,db: Session):
@@ -28,3 +29,23 @@ class UserServvice:
     def updae():
         pass
 
+    
+    def login_for_token(self, data: UserLogin) -> Token:
+        user = self.repository.authenticate_user(data)
+
+        if not user:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Incorrect username or password",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
+
+        # Use a unique and serializable field in JWT payload
+        access_token = create_access_token(data={"sub": user.username})
+        refresh_token = create_refresh_token(data={"sub": user.username})
+
+        return Token(
+            access_token=access_token,
+            refresh_token=refresh_token,
+            token_type="Bearer"
+        )

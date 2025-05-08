@@ -2,7 +2,7 @@ import uuid
 from ..config.database import Base
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
-from sqlalchemy import String , Column , DateTime
+from sqlalchemy import String , Column , DateTime , Boolean
 from datetime import datetime
 
 class User(Base):
@@ -18,9 +18,11 @@ class User(Base):
     email = Column( String(length=50),
                    unique=True)
     
-    hash_passowrd = Column(String)
+    hash_password = Column(String)
 
     created_at = Column(DateTime, default=datetime.now())
+
+    disable = Column( Boolean , default= False)
 
 
     def __repr__(self):
