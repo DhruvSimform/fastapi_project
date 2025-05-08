@@ -21,14 +21,14 @@ USER_DB_Dependancy = Annotated[
 
 @router.post("", status_code=status.HTTP_201_CREATED, response_model=UserOutput)
 def create_user(data: UserInput, db: DB_Depndancy):
+    print(data)
     _service = UserServvice(db)
     return _service.create(data)
 
 
 @router.get("", response_model=list[UserOutput], status_code=status.HTTP_200_OK)
 def get_users(user_db: USER_DB_Dependancy):
-    user, db = user_db
-    print(user)
+    _, db = user_db
     _service = UserServvice(db)
     return _service.get_all()
 

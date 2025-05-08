@@ -14,7 +14,7 @@ class UserRepository:
 
     def create(self, data: UserInput) -> UserOutput:
         user = User(
-            **data.model_dump(exclude={"password"}),
+            **data.model_dump(exclude={"password", "confirm_password"}),
             hash_password=get_password_hash(data.password),
         )
         self.db.add(user)

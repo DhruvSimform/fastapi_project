@@ -16,6 +16,7 @@ class UserInput(User):
     def validate_username_field(cls,value):
         if " " in value:
             raise ValueError("Username cannot contain spaces")
+        return value
     
     @field_validator('password')
     def validate_password_field(cls,value):
