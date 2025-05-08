@@ -1,11 +1,11 @@
 import os
 from logging.config import fileConfig
 
-from sqlalchemy import create_engine, pool
-from alembic import context
-
-from src.config.database import Base  # adjust if your path differs
 from dotenv import load_dotenv
+from sqlalchemy import create_engine, pool
+
+from alembic import context
+from src.config.database import Base  # adjust if your path differs
 
 load_dotenv()
 

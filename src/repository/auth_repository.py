@@ -1,7 +1,9 @@
 from sqlalchemy.orm import Session
+
 from ..models.user_model import User
-from ..schemas.user_schema import UserOutput, UserLogin
+from ..schemas.user_schema import UserLogin, UserOutput
 from ..utils.password_helper import verify_password
+
 
 class AuthRepository:
     def __init__(self, db: Session):
