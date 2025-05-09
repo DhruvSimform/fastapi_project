@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import select
 
 from ..models.user_model import User
-from ..schemas.user_schema import UserInput, UserOutput , UserInDb , UserOutputAdmin
+from ..schemas.user_schema import UserInput, UserOutput , UserInDb , UserOutputAdmin , UpdateUser
 from ..utils.password_helper import get_password_hash
 
 
@@ -29,7 +29,7 @@ class UserRepository:
     def get_all_users(self) -> list[UserOutput] :
         # stmt = select(User.username, User.email,User.bio ,  User.first_name , User.last_name )
         # results = self.db.execute(stmt).mappings().all()
-        return self.db.query(User.username, User.email, User.bio, User.first_name, User.last_name).all()
+        return self.db.query(User.username, User.email, User.bio, User.full_name , User.last_login).all()
 
     def get_user(self, _id: UUID4) -> UserOutput | None:
         return self.db.query(User).filter_by(id=_id).first()
@@ -51,3 +51,14 @@ class UserRepository:
         self.db.delete(user)
         self.db.commit()
         return True
+    
+    def update_user(self, _username: str, data: UpdateUser) -> UserOutputAdmin:
+        user_query = self.db.query(User).filter_by(username=_username)
+        user = user_query.first()
+
+        update_data = data.model_dump(exclude_unset=True)
+        user_query.update(update_data)
+        self.db.commit()
+
+        self.db.refresh(user)
+        return user

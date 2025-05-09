@@ -9,8 +9,10 @@ class UserRole(str ,Enum):
     user = "user"
 
 class User(BaseModel):
-    class Config:
-        orm_mode = True
+
+    model_config = {
+        'from_attributes': True
+    }
 
 
 class UserInput(User):
@@ -57,31 +59,23 @@ class UserInDb(User):
     created_at: datetime
 
 
-    class Config:
-        orm_mode = True
-
 
 class UserOutput(User):
     username: str
     email: EmailStr
+    full_name : str | None = None
     bio: str | None
-    first_name : str | None
-    last_name : str | None
 
-
-    @computed_field(return_type=str)
-    @property
-    def full_name(self):
-        return f"{self.first_name} {self.last_name}"
 
 class UserOutputAdmin(UserOutput):
-    id: UUID4 
-    role:str 
+    id: UUID4
+    role:str
     last_login: datetime | None
 
 class UpdateUser(User):
-    username: str | None = None
-    email: EmailStr | None = None
+    first_name:str | None = None
+    last_name:str | None = None
+    bio:str | None = None
 
 
 

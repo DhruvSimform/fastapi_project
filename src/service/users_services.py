@@ -3,7 +3,7 @@ from pydantic import UUID4
 from sqlalchemy.orm import Session
 
 from ..repository.users_repository import UserRepository
-from ..schemas.user_schema import UserInput, UserOutput , UserOutputAdmin ,UserRole
+from ..schemas.user_schema import UserInput, UserOutput , UserOutputAdmin ,UserRole , UpdateUser
 
 
 class UserServvice:
@@ -36,5 +36,5 @@ class UserServvice:
         return self.repository.delete_user(_id)
         
 
-    def updae():
-        pass
+    def update(self,_username:str,data: UpdateUser) -> UserOutputAdmin:
+        return self.repository.update_user(_username , data)
