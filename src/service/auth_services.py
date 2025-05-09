@@ -12,6 +12,7 @@ class AuthService:
 
     def login_for_token(self, data: AuthInput) -> Token:
         user = self.repository.authenticate_user(data)
+        print(user)
         if not user:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,

@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 
 from ..dependencies import get_current_user_and_db, get_db , get_admin_user_and_db
 from ..schemas.auth_schema import Token
-from ..schemas.user_schema import UserInput, UserOutput , UserRole
+from ..schemas.user_schema import UserInput, UserOutput , UserRole, User , UserOutputAdmin 
 from ..service.users_services import UserServvice
 
 router = APIRouter(prefix="/users", tags=["Users"])
@@ -30,11 +30,11 @@ def create_user(data: UserInput, db: DB_Depndancy):
     return _service.create(data)
 
 
-@router.get("", response_model=list[UserOutput], status_code=status.HTTP_200_OK )
+@router.get("", status_code=status.HTTP_200_OK  , response_model= list[UserOutput | UserOutputAdmin])
 def get_users(user_db: USER_DB_Dependancy):
     user, db = user_db
     _service = UserServvice(db)
-    return _service.get_all()
+    return _service.get_all(user.role)
 
 
 @router.get("/{id}", response_model=UserOutput, status_code=status.HTTP_200_OK)
@@ -48,3 +48,5 @@ def delete_user(id: UUID4, user_db: ADMIN_USER_DB_Dependancy):
     _ , db = user_db
     _service = UserServvice(db)
     return _service.delete(id)
+
+# @router.put("/me",res)

@@ -3,7 +3,7 @@ from pydantic import UUID4
 from sqlalchemy.orm import Session
 
 from ..repository.users_repository import UserRepository
-from ..schemas.user_schema import UserInput, UserOutput
+from ..schemas.user_schema import UserInput, UserOutput , UserOutputAdmin ,UserRole
 
 
 class UserServvice:
@@ -18,9 +18,12 @@ class UserServvice:
             )
         return self.repository.create(data)
 
-    def get_all(self) -> list | None:
-        print(self.repository.get_all())
-        return self.repository.get_all()
+    def get_all(self,user_role:UserRole) -> list[UserOutput | UserOutputAdmin]:
+        if user_role == UserRole.admin:
+            return self.repository.get_all_users_admin()
+        return self.repository.get_all_users()
+        
+    
 
     def get(self, _id: UUID4) -> UserOutput:
         return self.repository.get_user(_id)

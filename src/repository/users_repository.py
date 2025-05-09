@@ -1,10 +1,11 @@
 from typing import Annotated, List
 
 from pydantic import UUID4
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session 
+from sqlalchemy import select
 
 from ..models.user_model import User
-from ..schemas.user_schema import UserInput, UserOutput , UserInDb
+from ..schemas.user_schema import UserInput, UserOutput , UserInDb , UserOutputAdmin
 from ..utils.password_helper import get_password_hash
 
 
@@ -22,8 +23,13 @@ class UserRepository:
         self.db.refresh(user)
         return user
 
-    def get_all(self) :
+    def get_all_users_admin(self) -> list[UserOutputAdmin]:
         return self.db.query(User).all()
+    
+    def get_all_users(self) -> list[UserOutput] :
+        # stmt = select(User.username, User.email,User.bio ,  User.first_name , User.last_name )
+        # results = self.db.execute(stmt).mappings().all()
+        return self.db.query(User.username, User.email, User.bio, User.first_name, User.last_name).all()
 
     def get_user(self, _id: UUID4) -> UserOutput | None:
         return self.db.query(User).filter_by(id=_id).first()

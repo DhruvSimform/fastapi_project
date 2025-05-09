@@ -1,4 +1,4 @@
-from pydantic import UUID4, BaseModel, EmailStr, Field, field_validator  , model_validator 
+from pydantic import UUID4, BaseModel, EmailStr, Field, field_validator  , model_validator  ,computed_field
 from ..utils.password_helper import validate_password
 from datetime import datetime
 from enum import Enum
@@ -9,7 +9,8 @@ class UserRole(str ,Enum):
     user = "user"
 
 class User(BaseModel):
-    pass
+    class Config:
+        orm_mode = True
 
 
 class UserInput(User):
@@ -61,16 +62,22 @@ class UserInDb(User):
 
 
 class UserOutput(User):
-    id: UUID4
     username: str
     email: EmailStr
-    full_name: str | None
     bio: str | None
-    role:str
-    last_login: datetime | None
+    first_name : str | None
+    last_name : str | None
 
-# class UserOutputAdmin(UserOutput):
-#     id: UUID4
+
+    @computed_field(return_type=str)
+    @property
+    def full_name(self):
+        return f"{self.first_name} {self.last_name}"
+
+class UserOutputAdmin(UserOutput):
+    id: UUID4 
+    role:str 
+    last_login: datetime | None
 
 class UpdateUser(User):
     username: str | None = None

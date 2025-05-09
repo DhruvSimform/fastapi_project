@@ -11,9 +11,9 @@ class AuthRepository:
 
     def authenticate_user(self, data: UserLogin) -> UserOutput | bool:
         user = self.db.query(User).filter_by(username=data.username).first()
-        user.last_login = datetime.now()
-        self.db.commit()
         if not user or not verify_password(data.password, user.hash_password):
             return False
+        user.last_login = datetime.now()
+        self.db.commit()
         return user
 
