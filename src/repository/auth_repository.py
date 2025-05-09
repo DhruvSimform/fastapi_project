@@ -1,9 +1,11 @@
+from datetime import datetime
+
 from sqlalchemy.orm import Session
 
 from ..models.user_model import User
 from ..schemas.user_schema import UserLogin, UserOutput
 from ..utils.password_helper import verify_password
-from datetime import datetime
+
 
 class AuthRepository:
     def __init__(self, db: Session):
@@ -16,4 +18,3 @@ class AuthRepository:
         user.last_login = datetime.now()
         self.db.commit()
         return user
-

@@ -1,17 +1,20 @@
 import uuid
 from datetime import datetime
 
-from sqlalchemy import Boolean, Column, DateTime, String , func
+from sqlalchemy import Boolean, Column, DateTime, String, func
 from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy.orm import relationship
 from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.orm import relationship
+
 from ..config.database import Base
 
 
 class User(Base):
     __tablename__ = "users"
 
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, nullable=False)
+    id = Column(
+        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, nullable=False
+    )
 
     username = Column(String(length=50), unique=True, nullable=False)
 
@@ -35,12 +38,10 @@ class User(Base):
     @hybrid_property
     def full_name(self):
         return f"{self.first_name} {self.last_name}"
-    
+
     @full_name.expression
     def full_name(cls):
         return func.concat(cls.first_name, " ", cls.last_name)
 
     def __repr__(self):
         return f"<User id={self.id}, username={self.username}>"
-    
-

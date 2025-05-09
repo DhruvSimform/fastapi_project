@@ -4,9 +4,9 @@ from fastapi import APIRouter, Depends, status
 from pydantic import UUID4
 from sqlalchemy.orm import Session
 
-from ..dependencies import get_current_user_and_db, get_db , get_admin_user_and_db
+from ..dependencies import get_admin_user_and_db, get_current_user_and_db, get_db
 from ..schemas.auth_schema import Token
-from ..schemas.user_schema import UserInput, UserOutput  , UserOutputAdmin  , UpdateUser
+from ..schemas.user_schema import UpdateUser, UserInput, UserOutput, UserOutputAdmin
 from ..service.users_services import UserServvice
 
 router = APIRouter(prefix="/users", tags=["Users"])
@@ -19,7 +19,7 @@ USER_DB_Dependancy = Annotated[
 ]
 
 ADMIN_USER_DB_Dependancy = Annotated[
-    tuple[UserOutput , Session] , Depends(get_admin_user_and_db)
+    tuple[UserOutput, Session], Depends(get_admin_user_and_db)
 ]
 
 
@@ -30,7 +30,11 @@ def create_user(data: UserInput, db: DB_Depndancy):
     return _service.create(data)
 
 
-@router.get("", status_code=status.HTTP_200_OK  , response_model= list[UserOutput | UserOutputAdmin])
+@router.get(
+    "",
+    status_code=status.HTTP_200_OK,
+    response_model=list[UserOutput | UserOutputAdmin],
+)
 def get_users(user_db: USER_DB_Dependancy):
     user, db = user_db
     _service = UserServvice(db)
@@ -43,16 +47,16 @@ def get_user(id: UUID4, user_db: USER_DB_Dependancy):
     _service = UserServvice(db)
     return _service.get(id)
 
+
 @router.delete("/{id}", response_model=None, status_code=status.HTTP_204_NO_CONTENT)
 def delete_user(id: UUID4, user_db: ADMIN_USER_DB_Dependancy):
-    _ , db = user_db
+    _, db = user_db
     _service = UserServvice(db)
     return _service.delete(id)
 
 
-@router.patch("/me" , status_code=status.HTTP_200_OK)
-def update_user(data:UpdateUser ,user_db: USER_DB_Dependancy):
-    user , db = user_db
+@router.patch("/me", status_code=status.HTTP_200_OK)
+def update_user(data: UpdateUser, user_db: USER_DB_Dependancy):
+    user, db = user_db
     _service = UserServvice(db)
-    return _service.update(user.username , data=data)
-    
+    return _service.update(user.username, data=data)

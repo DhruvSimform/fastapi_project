@@ -1,11 +1,17 @@
 from typing import Annotated, List
 
 from pydantic import UUID4
-from sqlalchemy.orm import Session 
 from sqlalchemy import select
+from sqlalchemy.orm import Session
 
 from ..models.user_model import User
-from ..schemas.user_schema import UserInput, UserOutput , UserInDb , UserOutputAdmin , UpdateUser
+from ..schemas.user_schema import (
+    UpdateUser,
+    UserInDb,
+    UserInput,
+    UserOutput,
+    UserOutputAdmin,
+)
 from ..utils.password_helper import get_password_hash
 
 
@@ -25,20 +31,24 @@ class UserRepository:
 
     def get_all_users_admin(self) -> list[UserOutputAdmin]:
         return self.db.query(User).all()
-    
-    def get_all_users(self) -> list[UserOutput] :
+
+    def get_all_users(self) -> list[UserOutput]:
         # stmt = select(User.username, User.email,User.bio ,  User.first_name , User.last_name )
         # results = self.db.execute(stmt).mappings().all()
-        return self.db.query(User.username, User.email, User.bio, User.full_name , User.last_login).all()
+        return self.db.query(
+            User.username, User.email, User.bio, User.full_name, User.last_login
+        ).all()
 
     def get_user(self, _id: UUID4) -> UserOutput | None:
         return self.db.query(User).filter_by(id=_id).first()
 
     def get_user_by_username(self, _username: str) -> UserOutput | None:
         return self.db.query(User).filter_by(username=_username).first()
-    
-    def get_user_by_username_or_email(self, _username: str, _email: str) -> UserOutput | None:
-        return self.db.query(User).filter_by(username=_username , email = _email).first()
+
+    def get_user_by_username_or_email(
+        self, _username: str, _email: str
+    ) -> UserOutput | None:
+        return self.db.query(User).filter_by(username=_username, email=_email).first()
 
     def user_exists_by_username(self, username: str) -> bool:
         return self.db.query(User).filter_by(username=username).first() is not None
@@ -51,7 +61,7 @@ class UserRepository:
         self.db.delete(user)
         self.db.commit()
         return True
-    
+
     def update_user(self, _username: str, data: UpdateUser) -> UserOutputAdmin:
         user_query = self.db.query(User).filter_by(username=_username)
         user = user_query.first()
