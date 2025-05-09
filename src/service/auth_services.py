@@ -4,7 +4,7 @@ from ..repository.auth_repository import AuthRepository
 from ..schemas.auth_schema import RefreshToken, Token
 from ..schemas.user_schema import UserLogin as AuthInput
 from ..utils.auth import create_access_token, create_refresh_token, verify_token
-
+from fastapi import HTTPException , status
 
 class AuthService:
     def __init__(self, db: Session):
@@ -12,6 +12,11 @@ class AuthService:
 
     def login_for_token(self, data: AuthInput) -> Token:
         user = self.repository.authenticate_user(data)
+        if not user:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Username or password is incorrect."
+            )
         access_token = create_access_token(data={"sub": user.username})
         refresh_token = create_refresh_token(data={"sub": user.username})
 

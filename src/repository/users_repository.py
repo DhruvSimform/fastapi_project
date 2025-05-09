@@ -4,7 +4,7 @@ from pydantic import UUID4
 from sqlalchemy.orm import Session
 
 from ..models.user_model import User
-from ..schemas.user_schema import UserInput, UserOutput
+from ..schemas.user_schema import UserInput, UserOutput , UserInDb
 from ..utils.password_helper import get_password_hash
 
 
@@ -22,7 +22,7 @@ class UserRepository:
         self.db.refresh(user)
         return user
 
-    def get_all(self) -> List[UserOutput]:
+    def get_all(self) :
         return self.db.query(User).all()
 
     def get_user(self, _id: UUID4) -> UserOutput | None:
@@ -30,6 +30,9 @@ class UserRepository:
 
     def get_user_by_username(self, _username: str) -> UserOutput | None:
         return self.db.query(User).filter_by(username=_username).first()
+    
+    def get_user_by_username_or_email(self, _username: str, _email: str) -> UserOutput | None:
+        return self.db.query(User).filter_by(username=_username , email = _email).first()
 
     def user_exists_by_username(self, username: str) -> bool:
         return self.db.query(User).filter_by(username=username).first() is not None
@@ -39,8 +42,6 @@ class UserRepository:
 
     def delete_user(self, _id: UUID4) -> bool:
         user = self.db.query(User).filter_by(id=_id).first()
-        if not user:
-            return False
         self.db.delete(user)
         self.db.commit()
         return True

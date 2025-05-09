@@ -11,14 +11,15 @@ class UserServvice:
         self.repository = UserRepository(db)
 
     def create(self, data: UserInput) -> UserOutput:
-        if self.repository.user_exists_by_username(data.username):
+        if self.repository.get_user_by_username_or_email(data.username , data.email):
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="User aleredy exists with this db",
+                detail="User aleredy exists with this username or email",
             )
         return self.repository.create(data)
 
-    def get_all(self) -> list[UserOutput] | None:
+    def get_all(self) -> list | None:
+        print(self.repository.get_all())
         return self.repository.get_all()
 
     def get(self, _id: UUID4) -> UserOutput:
@@ -29,6 +30,8 @@ class UserServvice:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND, detail="User not exists"
             )
+        return self.repository.delete_user(_id)
+        
 
     def updae():
         pass
