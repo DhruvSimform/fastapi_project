@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, status
 from pydantic import UUID4
 from sqlalchemy.orm import Session
 
-from ..dependencies import get_current_user_and_db, get_db
+from ..dependencies import get_current_user_and_db, get_db , get_admin_user_and_db
 from ..schemas.auth_schema import Token
 from ..schemas.user_schema import UserInput, UserOutput , UserRole
 from ..service.users_services import UserServvice
@@ -16,6 +16,10 @@ DB_Depndancy = Annotated[Session, Depends(get_db)]
 
 USER_DB_Dependancy = Annotated[
     tuple[UserOutput, Session], Depends(get_current_user_and_db)
+]
+
+ADMIN_USER_DB_Dependancy = Annotated[
+    tuple[UserOutput , Session] , Depends(get_admin_user_and_db)
 ]
 
 
@@ -40,7 +44,7 @@ def get_user(id: UUID4, user_db: USER_DB_Dependancy):
     return _service.get(id)
 
 @router.delete("/{id}", response_model=None, status_code=status.HTTP_204_NO_CONTENT)
-def delete_user(id: UUID4, user_db: USER_DB_Dependancy):
+def delete_user(id: UUID4, user_db: ADMIN_USER_DB_Dependancy):
     _ , db = user_db
     _service = UserServvice(db)
     return _service.delete(id)
