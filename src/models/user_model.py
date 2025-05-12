@@ -34,6 +34,7 @@ class User(Base):
     bio = Column(String(length=255), nullable=True)
     profile_picture_url = Column(String, nullable=True)
     last_login = Column(DateTime, nullable=True)
+    is_administration = Column(Boolean)
 
     @hybrid_property
     def full_name(self):
