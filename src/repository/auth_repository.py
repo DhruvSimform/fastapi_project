@@ -3,7 +3,7 @@ from datetime import datetime
 from sqlalchemy.orm import Session
 
 from ..models.user_model import User
-from ..schemas.user_schema import UserLogin, UserOutput ,UserDetailedOutput
+from ..schemas.user_schema import UserDetailedOutput, UserLogin, UserOutput
 from ..utils.password_helper import verify_password
 
 

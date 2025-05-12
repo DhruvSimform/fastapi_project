@@ -1,16 +1,9 @@
 from datetime import datetime
+
+from pydantic import UUID4, BaseModel, EmailStr, field_validator, model_validator
+
 from ..config.constant import UserRole
-
-from pydantic import (
-    UUID4,
-    BaseModel,
-    EmailStr,
-    field_validator,
-    model_validator,
-)
-
 from ..utils.password_helper import validate_password
-
 
 
 class User(BaseModel):
@@ -45,7 +38,7 @@ class UserInput(User):
         if self.password != self.confirm_password:
             raise ValueError("password and confirm password is not same")
         return self
-    
+
 
 class UserInDb(User):
     id: UUID4
@@ -74,7 +67,6 @@ class UserDetailedOutput(UserOutput):
     id: UUID4
     role: str
     last_login: datetime | None
-
 
 
 class UpdateUser(User):

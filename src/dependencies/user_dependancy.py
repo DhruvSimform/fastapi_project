@@ -3,8 +3,8 @@ from typing import Annotated
 from fastapi import Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
-from ..schemas.user_schema import UserDetailedOutput
 from ..config.constant import UserRole
+from ..schemas.user_schema import UserDetailedOutput
 from .auth import get_current_user_and_db
 
 USER_DB_Dependancy = Annotated[
@@ -12,7 +12,9 @@ USER_DB_Dependancy = Annotated[
 ]
 
 
-def get_admin_user_and_db(user_db: USER_DB_Dependancy) -> tuple[UserDetailedOutput, Session]:
+def get_admin_user_and_db(
+    user_db: USER_DB_Dependancy,
+) -> tuple[UserDetailedOutput, Session]:
 
     user, db = user_db
 

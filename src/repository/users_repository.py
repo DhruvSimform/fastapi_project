@@ -5,12 +5,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from ..models.user_model import User
-from ..schemas.user_schema import (
-    UpdateUser,
-    UserInput,
-    UserOutput,
-    UserDetailedOutput,
-)
+from ..schemas.user_schema import UpdateUser, UserDetailedOutput, UserInput, UserOutput
 from ..utils.password_helper import get_password_hash
 
 
@@ -42,15 +37,27 @@ class UserRepository:
         return self.db.query(User).filter_by(id=_id).first()
 
     def get_user_by_username(self, _username: str) -> UserOutput | None:
-        return self.db.query(User.username, User.email, User.bio, User.full_name, User.last_login).filter_by(username=_username).first()
-    
-    def get_user_all_detail_by_username(self, _username: str) -> UserDetailedOutput | None:
+        return (
+            self.db.query(
+                User.username, User.email, User.bio, User.full_name, User.last_login
+            )
+            .filter_by(username=_username)
+            .first()
+        )
+
+    def get_user_all_detail_by_username(
+        self, _username: str
+    ) -> UserDetailedOutput | None:
         return self.db.query(User).filter_by(username=_username).first()
 
     def get_user_by_username_or_email(
         self, _username: str, _email: str
     ) -> UserOutput | None:
-        return self.db.query(User).filter((User.username == _username) | (User.email == _email)).first()
+        return (
+            self.db.query(User)
+            .filter((User.username == _username) | (User.email == _email))
+            .first()
+        )
 
     def user_exists_by_username(self, username: str) -> bool:
         return self.db.query(User).filter_by(username=username).first() is not None

@@ -5,9 +5,9 @@ from sqlalchemy.orm import Session
 from ..repository.users_repository import UserRepository
 from ..schemas.user_schema import (
     UpdateUser,
+    UserDetailedOutput,
     UserInput,
     UserOutput,
-    UserDetailedOutput,
     UserRole,
 )
 
@@ -36,17 +36,18 @@ class UserService:
             )
 
         return self.repository.get_user(_id)
-    
-    def get_by_username(self, current_user_role: UserRole,_username: str) -> UserOutput | UserDetailedOutput:
+
+    def get_by_username(
+        self, current_user_role: UserRole, _username: str
+    ) -> UserOutput | UserDetailedOutput:
         if not self.repository.user_exists_by_username(_username):
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND, detail="User not exists"
             )
-        
+
         if current_user_role == UserRole.admin:
             return self.repository.get_user_all_detail_by_username(_username)
         return self.repository.get_user_by_username(_username)
-
 
     def delete_user(self, _id: UUID4) -> bool:
         if not self.repository.user_exists_by_id(_id):
