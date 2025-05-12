@@ -90,6 +90,7 @@ def get_user_username(username: str, user_db: USER_DB_Dependancy):
     "/{id}",
     response_model=UserDetailedOutput,
     status_code=status.HTTP_200_OK,
+    deprecated=True
 )
 def get_user_by_id(id: UUID4, user_db: USER_DB_Dependancy):
     _, db = user_db
