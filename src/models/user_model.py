@@ -35,7 +35,6 @@ class User(Base):
     profile_picture_url = Column(String, nullable=True)
     last_login = Column(DateTime, nullable=True)
 
-
     @hybrid_property
     def full_name(self):
         return f"{self.first_name} {self.last_name}"

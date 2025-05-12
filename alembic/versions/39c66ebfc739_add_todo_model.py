@@ -1,8 +1,8 @@
-"""final table
+"""add todo model
 
-Revision ID: 4d63e3f73356
-Revises:
-Create Date: 2025-05-12 12:32:07.396250
+Revision ID: 39c66ebfc739
+Revises: 57420827eea7
+Create Date: 2025-05-12 15:48:06.819133
 
 """
 
@@ -14,8 +14,8 @@ from sqlalchemy.dialects import postgresql
 from alembic import op
 
 # revision identifiers, used by Alembic.
-revision: str = "4d63e3f73356"
-down_revision: Union[str, None] = None
+revision: str = "39c66ebfc739"
+down_revision: Union[str, None] = "57420827eea7"
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
@@ -48,20 +48,16 @@ def downgrade() -> None:
             "created_at", postgresql.TIMESTAMP(), autoincrement=False, nullable=False
         ),
         sa.Column("disable", sa.BOOLEAN(), autoincrement=False, nullable=False),
-        sa.Column(
-            "phone_number", sa.VARCHAR(length=15), autoincrement=False, nullable=True
-        ),
         sa.Column("role", sa.VARCHAR(length=20), autoincrement=False, nullable=False),
-        sa.Column(
-            "last_login", postgresql.TIMESTAMP(), autoincrement=False, nullable=True
-        ),
         sa.Column("bio", sa.VARCHAR(length=255), autoincrement=False, nullable=True),
         sa.Column(
             "profile_picture_url", sa.VARCHAR(), autoincrement=False, nullable=True
         ),
+        sa.Column(
+            "last_login", postgresql.TIMESTAMP(), autoincrement=False, nullable=True
+        ),
         sa.PrimaryKeyConstraint("id", name="users_pkey"),
         sa.UniqueConstraint("email", name="users_email_key"),
-        sa.UniqueConstraint("phone_number", name="users_phone_number_key"),
         sa.UniqueConstraint("username", name="users_username_key"),
     )
     # ### end Alembic commands ###
