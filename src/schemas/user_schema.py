@@ -51,7 +51,7 @@ class UserInput(User):
         if self.password != self.confirm_password:
             raise ValueError("password and confirm password is not same")
         return self
-
+    
 
 class UserInDb(User):
     id: UUID4

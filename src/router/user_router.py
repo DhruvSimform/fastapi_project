@@ -1,6 +1,6 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, status , Body
 from pydantic import UUID4
 from sqlalchemy.orm import Session
 
@@ -23,11 +23,37 @@ ADMIN_USER_DB_Dependancy = Annotated[
 ]
 
 
-@router.post("", status_code=status.HTTP_201_CREATED, response_model=UserOutput)
-def create_user(data: UserInput, db: DB_Depndancy):
-    _service = UserServvice(db)
+from fastapi import Body
+from typing import Annotated
+from fastapi.responses import JSONResponse
 
+@router.post(
+    "",
+    status_code=status.HTTP_201_CREATED,
+    response_model=UserOutput,
+    summary="Create a new user",
+    description=(
+        "Registers a new user in the system.\n\n"
+        "Clients should provide unique username, valid email, and a strong password. "
+        "The response includes the newly created user's ID, username, email, and role. "
+        "Note: Default role is 'user' unless specified otherwise by the admin."
+    ),
+    response_description="Returns the created user's data",
+)
+def create_user(
+  data: Annotated[
+    UserInput,
+    Body(
+        title="User Input",
+        description="Payload to create a new user account.",
+    )
+],
+    db: DB_Depndancy
+):
+
+    _service = UserServvice(db)
     return _service.create(data)
+
 
 
 @router.get(
