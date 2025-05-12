@@ -5,7 +5,8 @@ class UserRole(str, Enum):
     admin = "admin"
     user = "user"
 
-class ToDoStatus (str , Enum):
+
+class ToDoStatus(str, Enum):
     pending = "pending"
     inprogress = "inprogress"
     completed = "completed"
