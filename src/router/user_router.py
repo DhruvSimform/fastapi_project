@@ -6,8 +6,8 @@ from sqlalchemy.orm import Session
 
 from ..dependencies import get_admin_user_and_db, get_current_user_and_db, get_db
 from ..schemas.auth_schema import Token
-from ..schemas.user_schema import UpdateUser, UserInput, UserOutput, UserOutputAdmin
-from ..service.users_services import UserServvice
+from ..schemas.user_schema import UpdateUser, UserInput, UserOutput, UserDetailedOutput
+from ..service.users_services import UserService
 
 router = APIRouter(prefix="/users", tags=["Users"])
 
@@ -15,11 +15,11 @@ router = APIRouter(prefix="/users", tags=["Users"])
 DB_Depndancy = Annotated[Session, Depends(get_db)]
 
 USER_DB_Dependancy = Annotated[
-    tuple[UserOutput, Session], Depends(get_current_user_and_db)
+    tuple[UserDetailedOutput, Session], Depends(get_current_user_and_db)
 ]
 
 ADMIN_USER_DB_Dependancy = Annotated[
-    tuple[UserOutput, Session], Depends(get_admin_user_and_db)
+    tuple[UserDetailedOutput, Session], Depends(get_admin_user_and_db)
 ]
 
 
@@ -30,28 +30,16 @@ from fastapi.responses import JSONResponse
 @router.post(
     "",
     status_code=status.HTTP_201_CREATED,
-    response_model=UserOutput,
-    summary="Create a new user",
-    description=(
-        "Registers a new user in the system.\n\n"
-        "Clients should provide unique username, valid email, and a strong password. "
-        "The response includes the newly created user's ID, username, email, and role. "
-        "Note: Default role is 'user' unless specified otherwise by the admin."
-    ),
-    response_description="Returns the created user's data",
+    response_model=UserDetailedOutput,
 )
-def create_user(
-  data: Annotated[
-    UserInput,
+def create_user(data: Annotated[UserInput,
     Body(
         title="User Input",
         description="Payload to create a new user account.",
-    )
-],
-    db: DB_Depndancy
-):
+    )],
+    db: DB_Depndancy):
 
-    _service = UserServvice(db)
+    _service = UserService(db)
     return _service.create(data)
 
 
@@ -59,30 +47,44 @@ def create_user(
 @router.get(
     "",
     status_code=status.HTTP_200_OK,
-    response_model=list[UserOutput | UserOutputAdmin],
+    response_model=list[UserOutput | UserDetailedOutput],
 )
 def get_users(user_db: USER_DB_Dependancy):
     user, db = user_db
-    _service = UserServvice(db)
+    _service = UserService(db)
     return _service.get_all(user.role)
 
+@router.patch("/me", status_code=status.HTTP_200_OK , response_model=UserDetailedOutput)
+def update_user(data: UpdateUser, user_db: USER_DB_Dependancy):
+    user, db = user_db
+    _service = UserService(db)
+    return _service.update_user(user.username, data=data)
 
-@router.get("/{id}", response_model=UserOutput, status_code=status.HTTP_200_OK)
-def get_user(id: UUID4, user_db: USER_DB_Dependancy):
+@router.get("/me", status_code=status.HTTP_200_OK , response_model=UserDetailedOutput)
+def get_profile_details(user_db: USER_DB_Dependancy):
+    user, db = user_db
+    _service = UserService(db)
+    print(user.id)
+    return _service.get(user.id)
+
+
+
+@router.get("/profile/{username}", response_model=UserDetailedOutput | UserOutput, status_code=status.HTTP_200_OK)
+def get_user_username(username: str, user_db: USER_DB_Dependancy):
+    user, db = user_db
+    _service = UserService(db)
+    return _service.get_by_username(user.role,username)
+
+@router.get("/{id}", response_model=UserDetailedOutput, status_code=status.HTTP_200_OK , deprecated=True)
+def get_user_by_id(id: UUID4, user_db: USER_DB_Dependancy):
     _, db = user_db
-    _service = UserServvice(db)
+    _service = UserService(db)
     return _service.get(id)
-
 
 @router.delete("/{id}", response_model=None, status_code=status.HTTP_204_NO_CONTENT)
 def delete_user(id: UUID4, user_db: ADMIN_USER_DB_Dependancy):
     _, db = user_db
-    _service = UserServvice(db)
-    return _service.delete(id)
+    _service = UserService(db)
+    return _service.delete_user(id)
 
 
-@router.patch("/me", status_code=status.HTTP_200_OK)
-def update_user(data: UpdateUser, user_db: USER_DB_Dependancy):
-    user, db = user_db
-    _service = UserServvice(db)
-    return _service.update(user.username, data=data)

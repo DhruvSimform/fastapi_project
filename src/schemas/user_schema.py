@@ -1,22 +1,16 @@
 from datetime import datetime
-from enum import Enum
+from ..config.constant import UserRole
 
 from pydantic import (
     UUID4,
     BaseModel,
     EmailStr,
-    Field,
-    computed_field,
     field_validator,
     model_validator,
 )
 
 from ..utils.password_helper import validate_password
 
-
-class UserRole(str, Enum):
-    admin = "admin"
-    user = "user"
 
 
 class User(BaseModel):
@@ -61,11 +55,12 @@ class UserInDb(User):
     first_name: str
     last_name: str
     bio: str | None = None
-    role: UserRole | None = None
+    role: UserRole | None = UserRole.user
     profile_picture_url: str | None = None
     last_login: datetime | None = None
 
     created_at: datetime
+    # updated_at = datetime
 
 
 class UserOutput(User):
@@ -75,10 +70,11 @@ class UserOutput(User):
     bio: str | None
 
 
-class UserOutputAdmin(UserOutput):
+class UserDetailedOutput(UserOutput):
     id: UUID4
     role: str
     last_login: datetime | None
+
 
 
 class UpdateUser(User):
