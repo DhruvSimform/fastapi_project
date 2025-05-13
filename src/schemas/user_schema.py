@@ -1,82 +1,201 @@
 from datetime import datetime
-
-from pydantic import UUID4, BaseModel, EmailStr, field_validator, model_validator
+from uuid import UUID
+from pydantic import (
+    BaseModel,
+    EmailStr,
+    Field,
+    field_validator,
+    model_validator,
+)
 
 from ..config.constant import UserRole
 from ..utils.password_helper import validate_password
 
-from pydantic import Field
 
 class User(BaseModel):
-
+    """Base model for user schema configuration."""
     model_config = {"from_attributes": True}
 
 
 class UserInput(User):
-    username: str = Field(..., description="The username of the user, which must be unique.")
-    email: EmailStr = Field(..., description="The email address of the user. Must be valid.")
-    password: str = Field(..., min_length=8, description="Password must be at least 8 characters long and include at least one letter, one number, and one special character.")
-    confirm_password: str = Field(..., description="Password confirmation. Must match the password.")
-    role: UserRole = Field(UserRole.user, description="Role of the user. Can be 'admin', 'user'. Default is 'user'.")
-    first_name: str | None = Field(None, description="The user's first name (optional).")
-    last_name: str | None = Field(None, description="The user's last name (optional).")
-    bio: str | None = Field(None, description="The user's bio (optional).")
+    """Schema for user registration."""
+
+    username: str = Field(
+        ...,
+        title="Username",
+        description="Unique username without spaces.",
+        example="dhruv",
+        min_length=3,
+        max_length=32,
+    )
+    email: EmailStr = Field(
+        ...,
+        title="Email Address",
+        description="Valid email address for the user.",
+        example="dhruv@gmail.com",
+    )
+    password: str = Field(
+        ...,
+        min_length=8,
+        title="Password",
+        description="Password must contain at least 8 characters, including a letter, number, and special character.",
+        example="P@ssw0rd!"
+    )
+    confirm_password: str = Field(
+        ...,
+        title="Confirm Password",
+        description="Re-enter the password for confirmation.",
+        example="P@ssw0rd!"
+    )
+    role: UserRole = Field(
+        default=UserRole.user,
+        title="User Role",
+        description="Role of the user. Either 'user' or 'admin'.",
+        examples=["admin", "user"]
+    )
+    first_name: str | None = Field(
+        None,
+        title="First Name",
+        description="User's first name (optional).",
+        example="John"
+    )
+    last_name: str | None = Field(
+        None,
+        title="Last Name",
+        description="User's last name (optional).",
+        example="Doe"
+    )
+    bio: str | None = Field(
+        None,
+        title="Bio",
+        description="A short bio about the user (optional).",
+        example="Tech enthusiast and blogger."
+    )
 
     @field_validator("username")
-    def validate_username_field(cls, value):
-        if " " in value:
-            raise ValueError("Username cannot contain spaces")
-        return value
+    @classmethod
+    def validate_username(cls, v: str) -> str:
+        if " " in v:
+            raise ValueError("Username cannot contain spaces.")
+        return v
 
     @field_validator("password")
-    def validate_password_field(cls, value):
-        if validate_password(password=value):
-            return value
-        raise ValueError("Password must be strong")
+    @classmethod
+    def validate_password_strength(cls, v: str) -> str:
+        if not validate_password(v):
+            raise ValueError("Password must contain a letter, number, and special character.")
+        return v
 
     @model_validator(mode="after")
-    def validate_password_and_confirm_password(self):
+    def check_passwords_match(self):
         if self.password != self.confirm_password:
-            raise ValueError("password and confirm password is not same")
+            raise ValueError("Password and Confirm Password must match.")
         return self
-    
-
-
-class UserInDb(User):
-    id: UUID4
-    username: str
-    email: EmailStr
-    hash_password: str
-    first_name: str
-    last_name: str
-    bio: str | None = None
-    role: UserRole | None = UserRole.user
-    profile_picture_url: str | None = None
-    last_login: datetime | None = None
-
-    created_at: datetime
-    # updated_at = datetime
-
-
-class UserOutput(User):
-    username: str
-    email: EmailStr
-    full_name: str | None = None
-    bio: str | None
-
-
-class UserDetailedOutput(UserOutput):
-    id: UUID4
-    role: str
-    last_login: datetime | None
-
-
-class UpdateUser(User):
-    first_name: str | None = None
-    last_name: str | None = None
-    bio: str | None = None
 
 
 class UserLogin(User):
+    """Schema for user login."""
+
+    username: str = Field(
+        ...,
+        title="Username",
+        description="Username of the user.",
+        example="johndoe_123"
+    )
+    password: str = Field(
+        ...,
+        title="Password",
+        description="User's password.",
+        example="P@ssw0rd!"
+    )
+
+
+class UserInDb(User):
+    """Schema representing the user stored in the database."""
+
+    id: UUID
     username: str
-    password: str
+    email: EmailStr
+    hashed_password: str
+    first_name: str | None = None
+    last_name: str | None = None
+    bio: str | None = None
+    role: UserRole = UserRole.user
+    profile_picture_url: str | None = None
+    last_login: datetime | None = None
+    created_at: datetime
+    # updated_at: datetime | None = None
+
+
+class UserOutput(User):
+    """Public-facing user schema."""
+
+    username: str = Field(
+        ...,
+        title="Username",
+        description="Username of the user.",
+        example="johndoe_123"
+    )
+    email: EmailStr = Field(
+        ...,
+        title="Email Address",
+        description="Email address of the user.",
+        example="johndoe@example.com"
+    )
+    full_name: str | None = Field(
+        None,
+        title="Full Name",
+        description="Full name of the user (optional).",
+        example="John Doe"
+    )
+    bio: str | None = Field(
+        None,
+        title="Bio",
+        description="A short bio about the user (optional).",
+        example="Software engineer and open-source contributor."
+    )
+
+
+class UserDetailedOutput(UserOutput):
+    """Detailed user response for profile or admin view."""
+    id: UUID = Field(
+        ...,
+        title="User ID",
+        description="Unique identifier for the user.",
+        example="123e4567-e89b-12d3-a456-426614174000"
+    )
+    role: str = Field(
+        ...,
+        title="User Role",
+        description="Role of the user, e.g., 'user' or 'admin'.",
+        example="admin"
+    )
+    last_login: datetime | None = Field(
+        None,
+        title="Last Login",
+        description="Timestamp of the user's last login (optional).",
+        example="2023-01-01T12:00:00"
+    )
+
+
+class UpdateUser(User):
+    """Schema for updating a user's profile."""
+
+    first_name: str | None = Field(
+        None,
+        title="First Name",
+        description="New first name (optional).",
+        example="Johnny"
+    )
+    last_name: str | None = Field(
+        None,
+        title="Last Name",
+        description="New last name (optional).",
+        example="Doestar"
+    )
+    bio: str | None = Field(
+        None,
+        title="Bio",
+        description="Updated bio (optional).",
+        example="Full-stack developer based in NY."
+    )
