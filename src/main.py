@@ -5,8 +5,6 @@ from fastapi.security import OAuth2PasswordBearer
 
 from src.router import auth_router, todo_router, user_router
 from src.utils.init_db import create_table
-from fastapi import FastAPI
-from dotenv import load_dotenv
 
 load_dotenv()
 
@@ -62,7 +60,6 @@ app = FastAPI(
     ],
     version="1.0.0",
 )
-
 
 
 create_table()
