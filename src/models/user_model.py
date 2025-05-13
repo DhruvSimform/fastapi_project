@@ -27,6 +27,7 @@ class User(Base):
     hash_password = Column(String, nullable=False)
 
     created_at = Column(DateTime, default=datetime.now, nullable=False)
+    updated_at = Column(DateTime, default=datetime.now , onupdate=datetime.now)
 
     disable = Column(Boolean, default=False, nullable=False)
 
@@ -34,7 +35,6 @@ class User(Base):
     bio = Column(String(length=255), nullable=True)
     profile_picture_url = Column(String, nullable=True)
     last_login = Column(DateTime, nullable=True)
-    is_administration = Column(Boolean)
 
     @hybrid_property
     def full_name(self):

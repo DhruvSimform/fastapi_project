@@ -5,6 +5,7 @@ from pydantic import UUID4, BaseModel, EmailStr, field_validator, model_validato
 from ..config.constant import UserRole
 from ..utils.password_helper import validate_password
 
+from pydantic import Field
 
 class User(BaseModel):
 
@@ -12,14 +13,14 @@ class User(BaseModel):
 
 
 class UserInput(User):
-    username: str
-    email: EmailStr
-    password: str
-    confirm_password: str
-    role: UserRole = UserRole.user
-    first_name: str | None = None
-    last_name: str | None = None
-    bio: str | None = None
+    username: str = Field(..., description="The username of the user, which must be unique.")
+    email: EmailStr = Field(..., description="The email address of the user. Must be valid.")
+    password: str = Field(..., min_length=8, description="Password must be at least 8 characters long and include at least one letter, one number, and one special character.")
+    confirm_password: str = Field(..., description="Password confirmation. Must match the password.")
+    role: UserRole = Field(UserRole.user, description="Role of the user. Can be 'admin', 'user'. Default is 'user'.")
+    first_name: str | None = Field(None, description="The user's first name (optional).")
+    last_name: str | None = Field(None, description="The user's last name (optional).")
+    bio: str | None = Field(None, description="The user's bio (optional).")
 
     @field_validator("username")
     def validate_username_field(cls, value):
@@ -38,6 +39,7 @@ class UserInput(User):
         if self.password != self.confirm_password:
             raise ValueError("password and confirm password is not same")
         return self
+    
 
 
 class UserInDb(User):

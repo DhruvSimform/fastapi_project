@@ -12,7 +12,7 @@ USER_DB_Dependancy = Annotated[
     tuple[UserDetailedOutput, Session], Depends(get_current_user_and_db)
 ]
 
-router = APIRouter(prefix="/todo", tags=["todo"])
+router = APIRouter(prefix="/todo", tags=["Todo"])
 
 
 @router.get("/{id}", response_model=TodoOutput, status_code=status.HTTP_200_OK)

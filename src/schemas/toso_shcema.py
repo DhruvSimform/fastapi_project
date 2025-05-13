@@ -1,7 +1,8 @@
 import uuid
-from datetime import datetime
+from datetime import date , datetime
 
 from pydantic import UUID4, BaseModel
+
 
 from ..config.constant import ToDoStatus
 
@@ -14,7 +15,7 @@ class TodoInDB(Todo):
     id: int
     title: str
     description: str
-    due_date: datetime
+    due_date: date
     status: ToDoStatus
 
     created_at: datetime
@@ -26,7 +27,7 @@ class TodoInDB(Todo):
 class TodoInput(Todo):
     title: str
     description: str
-    due_date: datetime | None = None
+    due_date: date | None = None
     status: ToDoStatus = ToDoStatus.pending
 
 
@@ -34,7 +35,7 @@ class TodoOutput(Todo):
     id: int
     title: str
     description: str
-    due_date: datetime
+    due_date: date
     status: ToDoStatus
     is_overdue: bool
 
@@ -45,5 +46,5 @@ class TodoOutput(Todo):
 class TodoUpdate(Todo):
     title: str | None = None
     description: str | None = None
-    due_date: datetime | None = None
+    due_date: date | None = None
     status: ToDoStatus | None = None
