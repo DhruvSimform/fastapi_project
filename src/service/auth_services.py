@@ -8,10 +8,16 @@ from ..utils.auth import create_access_token, create_refresh_token, verify_token
 
 
 class AuthService:
+    """
+    AuthService class provides authentication-related services, including user login and token management.
+    """
+    
     def __init__(self, db: Session):
         self.repository = AuthRepository(db)
 
     def login_for_token(self, data: AuthInput) -> Token:
+        """Authenticate user and generate tokens."""
+
         user = self.repository.authenticate_user(data)
         if not user:
             raise HTTPException(
@@ -30,6 +36,10 @@ class AuthService:
 
     @staticmethod
     def refresh_access_token(_token: RefreshToken) -> RefreshToken:
+        """
+        Refreshes the access token and generates a new refresh token using the provided refresh token.
+        """
+
         payload = verify_token(token=_token)
 
         access_token = create_access_token(data=payload)

@@ -8,6 +8,11 @@ from ..utils.password_helper import verify_password
 
 
 class AuthRepository:
+    """
+    Repository class for handling authentication-related database operations.
+    Provides methods for user authentication and updating login details.
+    """
+
     def __init__(self, db: Session):
         self.db = db
 
