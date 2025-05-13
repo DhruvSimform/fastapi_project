@@ -74,7 +74,7 @@ class UserRepository:
         """
         Retrieve detailed information of a user by their username.
         """
-        
+
         return self.db.query(User).filter_by(username=_username).first()
 
     def get_user_by_username_or_email(
@@ -83,7 +83,7 @@ class UserRepository:
         """
         Retrieve a user by matching username or email.
         """
-        
+
         return (
             self.db.query(User)
             .filter((User.username == _username) | (User.email == _email))

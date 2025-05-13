@@ -11,7 +11,7 @@ class AuthService:
     """
     AuthService class provides authentication-related services, including user login and token management.
     """
-    
+
     def __init__(self, db: Session):
         self.repository = AuthRepository(db)
 

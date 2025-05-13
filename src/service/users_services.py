@@ -66,4 +66,3 @@ class UserService:
     def update_user(self, _username: str, data: UpdateUser) -> UserDetailedOutput:
         """Update user details using their username."""
         return self.repository.update_user(_username, data)
-
