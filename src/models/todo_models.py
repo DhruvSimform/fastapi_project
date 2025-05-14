@@ -1,17 +1,7 @@
 from datetime import datetime
 
-from sqlalchemy import (
-    UUID,
-    Column,
-    Date,
-    DateTime,
-    Enum,
-    ForeignKey,
-    Integer,
-    String,
-    Text,
-    func,
-)
+from sqlalchemy import (UUID, Column, Date, DateTime, Enum, ForeignKey,
+                        Integer, String, Text, func)
 from sqlalchemy.ext.hybrid import hybrid_property
 
 from ..config.constant import ToDoStatus

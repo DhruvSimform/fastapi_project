@@ -1,14 +1,17 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Body, Depends, status
+from fastapi import APIRouter, BackgroundTasks, Body, Depends, status
 from fastapi.responses import JSONResponse
 from pydantic import UUID4
 from sqlalchemy.orm import Session
 
-from ..dependencies import get_admin_user_and_db, get_current_user_and_db, get_db
+from ..dependencies import (get_admin_user_and_db, get_current_user_and_db,
+                            get_db)
 from ..schemas.auth_schema import Token
-from ..schemas.user_schema import UpdateUser, UserDetailedOutput, UserInput, UserOutput
+from ..schemas.user_schema import (UpdateUser, UserDetailedOutput, UserInput,
+                                   UserOutput)
 from ..service.users_services import UserService
+from ..utils.email import send_welcome_email
 
 router = APIRouter(prefix="/users", tags=["Users"])
 
@@ -40,8 +43,9 @@ def create_user(
         ),
     ],
     db: DB_Depndancy,
+    backgroundtask: BackgroundTasks,
 ):
-    _service = UserService(db)
+    _service = UserService(db, backgroundtask)
     return _service.create(data)
 
 
@@ -53,7 +57,7 @@ def create_user(
     description="Fetch a list of all users. Accessible based on user role.",
     response_description="A list of users.",
 )
-def get_users(user_db: USER_DB_Dependancy):
+async def get_users(user_db: USER_DB_Dependancy, background_tasks: BackgroundTasks):
     user, db = user_db
     _service = UserService(db)
     return _service.get_all(user.role)

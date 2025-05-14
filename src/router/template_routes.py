@@ -4,9 +4,7 @@ from fastapi.responses import FileResponse, HTMLResponse
 from ..config.settings import settings
 from ..utils.template_engine import templates
 
-router = APIRouter(
-    tags=["Templates"]
-)
+router = APIRouter(tags=["Templates"])
 
 
 @router.get("/", response_class=HTMLResponse)

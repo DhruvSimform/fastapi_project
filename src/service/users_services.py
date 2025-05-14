@@ -1,22 +1,19 @@
-from fastapi import HTTPException, status
+from fastapi import BackgroundTasks, HTTPException, status
 from pydantic import UUID4
 from sqlalchemy.orm import Session
 
 from ..repository.users_repository import UserRepository
-from ..schemas.user_schema import (
-    UpdateUser,
-    UserDetailedOutput,
-    UserInput,
-    UserOutput,
-    UserRole,
-)
+from ..schemas.user_schema import (UpdateUser, UserDetailedOutput, UserInput,
+                                   UserOutput, UserRole)
+from ..utils.email import send_welcome_email
 
 
 class UserService:
     """Service layer for handling user-related business logic."""
 
-    def __init__(self, db: Session):
+    def __init__(self, db: Session, backroundtask: BackgroundTasks = None):
         self.repository = UserRepository(db)
+        self.backroundtask = backroundtask
 
     def create(self, data: UserInput) -> UserOutput:
         """Create a new user if username or email doesn't already exist."""
@@ -25,7 +22,9 @@ class UserService:
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="User aleredy exists with this username or email",
             )
-        return self.repository.create(data)
+        result = self.repository.create(data)
+        self.backroundtask.add_task(send_welcome_email, result.email, result.username)
+        return result
 
     def get_all(self, user_role: UserRole) -> list[UserOutput | UserDetailedOutput]:
         """Retrieve all users, with extra details if the requester is an admin."""
