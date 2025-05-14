@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Welcome Email</title>
+</head>
+<body style="font-family: Arial, sans-serif; background-color: #f3f4f6; padding: 2rem; margin: 0;">
+  <div style="background: white; border-radius: 12px; padding: 2rem; max-width: 600px; margin: 0 auto; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);">
+    <h1 style="color: #1e40af; margin-bottom: 1rem;">Welcome, {{ username }} 🎉</h1>
+    <p style="color: #374151; font-size: 16px;">Thanks for registering on our platform.</p>
+    
+    <p style="font-weight: bold; color: #111827; margin-top: 1.5rem;">Explore our API Docs:</p>
+    <ul style="padding-left: 1rem; color: #2563eb; font-weight: 500;">
+      <li><a href="{{ domain }}/docs" style="color: #2563eb; text-decoration: none;">📘 Swagger UI</a></li>
+      <li><a href="{{ domain }}/redoc" style="color: #2563eb; text-decoration: none;">📙 ReDoc</a></li>
+    </ul>
+
+    <p style="color: #374151; font-size: 16px;">Happy building! 🚀</p>
+  </div>
+</body>
+</html>

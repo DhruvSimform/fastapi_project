@@ -1,0 +1,58 @@
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f3f4f6;
+    padding: 2rem;
+  }
+  
+  .email-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .email-card {
+    background: white;
+    border-radius: 12px;
+    padding: 2rem;
+    max-width: 600px;
+    width: 100%;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+  }
+  
+  .welcome-title {
+    color: #1e40af;
+    margin-bottom: 1rem;
+  }
+  
+  .intro-text,
+  .footer-text {
+    color: #374151;
+    font-size: 1rem;
+    margin-bottom: 1rem;
+  }
+  
+  .section-title {
+    font-weight: bold;
+    color: #111827;
+    margin-top: 1.5rem;
+  }
+  
+  .docs-links {
+    list-style: none;
+    padding-left: 0;
+  }
+  
+  .docs-links li {
+    margin: 0.5rem 0;
+  }
+  
+  .docs-links a {
+    color: #2563eb;
+    text-decoration: none;
+    font-weight: 500;
+  }
+  
+  .docs-links a:hover {
+    text-decoration: underline;
+  }
+  

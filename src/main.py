@@ -1,15 +1,14 @@
 import uvicorn
-from dotenv import load_dotenv
-from fastapi import FastAPI
-from fastapi.security import OAuth2PasswordBearer
-from fastapi.staticfiles import StaticFiles
-from fastapi.templating import Jinja2Templates
 
-from src.config.settings import STATIC_DIR, TEMPLATES_DIR
+from fastapi import FastAPI
+
+from fastapi.staticfiles import StaticFiles
+
+
+from src.config.settings import STATIC_DIR, settings
 from src.router import auth_router, template_routes, todo_router, user_router
 from src.utils.init_db import create_table
 
-load_dotenv()
 
 from fastapi import FastAPI
 
@@ -65,12 +64,9 @@ app = FastAPI(
 )
 
 
-
 # Mount static directory if it exists
 if STATIC_DIR.exists():
-    print("\n\n\n\n", STATIC_DIR)
     app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
-
 
 
 create_table()
@@ -80,6 +76,7 @@ app.include_router(user_router.router)
 app.include_router(todo_router.router)
 
 app.include_router(template_routes.router)
+
 
 
 
