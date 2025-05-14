@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>FastAPI Project</title>
+    <link rel="stylesheet" href="static/css/index.css">
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 FastAPI Project</h1>
+        <p class="description">
+            This project showcases the features and capabilities of the FastAPI framework, ideal for building modern, high-performance web APIs.
+        </p>
+
+        <section>
+            <h2>🔐 Authentication</h2>
+            <ul>
+                <li>User registration and JWT-based login</li>
+                <li>Token refresh and secure password hashing</li>
+            </ul>
+
+            <h2>👤 User Management</h2>
+            <ul>
+                <li>User account creation, profile view and update</li>
+                <li>Admin-only field access (last login, user ID, role)</li>
+                <li>Role-based data access with query optimization</li>
+                <li>Limited visibility for normal users</li>
+            </ul>
+
+            <h2>📝 Todo Management</h2>
+            <ul>
+                <li>CRUD operations for authenticated users</li>
+                <li>Pydantic-based input validation</li>
+                <li>PostgreSQL integration and custom error handling</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>⚙️ Requirements</h2>
+            <ul>
+                <li>Python 3.8+</li>
+                <li>uv (install: <code>pip install uv</code>)</li>
+                <li>Uvicorn</li>
+            </ul>
+
+            <h2>📦 Installation</h2>
+            <pre><code>git clone git@github.com:DhruvSimform/fastapi_project.git
+cd fastapi_project
+uv run uvicorn src.main:app --reload</code></pre>
+
+            <h2>🚀 Run the Application</h2>
+            <p>The app will run at <a href="{{ PROJECT_DOMAIN }}">{{ PROJECT_DOMAIN }}</a></p>
+            <ul>
+                <li>Swagger UI: <a href="{{ PROJECT_DOMAIN }}/docs" target="_blank">Swagger UI</a></li>
+                <li>ReDoc: <a href="{{ PROJECT_DOMAIN }}/redoc" target="_blank">/redoc</a></li>
+            </ul>
+
+            <h2>📁 Project Structure</h2>
+            <pre><code>fastapi_project/
+├── src/
+│   ├── config/
+│   ├── dependencies/
+│   ├── main.py
+│   ├── models/
+│   ├── repository/
+│   ├── router/
+│   ├── schemas/
+│   ├── service/
+│   └── utils/
+├── alembic/
+├── alembic.ini
+├── pyproject.toml
+├── uv.lock
+├── requirements.txt
+├── .gitignore
+└── README.md</code></pre>
+
+            <h2>🤝 Contributing</h2>
+            <p>Fork the repo and submit a pull request. Contributions are welcome!</p>
+
+            <h2>📄 License</h2>
+            <p>MIT License</p>
+        </section>
+    </div>
+</body>
+</html>
