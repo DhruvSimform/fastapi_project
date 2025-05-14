@@ -1,7 +1,5 @@
 from pathlib import Path
-
 from fastapi.templating import Jinja2Templates
-
 from src.config.settings import TEMPLATES_DIR
 
 if not Path(TEMPLATES_DIR).exists():
