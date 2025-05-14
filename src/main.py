@@ -65,10 +65,12 @@ app = FastAPI(
 )
 
 
+
 # Mount static directory if it exists
 if STATIC_DIR.exists():
     print("\n\n\n\n", STATIC_DIR)
     app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
+
 
 
 create_table()
@@ -76,7 +78,9 @@ create_table()
 app.include_router(auth_router.router)
 app.include_router(user_router.router)
 app.include_router(todo_router.router)
+
 app.include_router(template_routes.router)
+
 
 
 def main():
