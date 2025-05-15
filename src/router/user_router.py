@@ -4,7 +4,7 @@ from fastapi import APIRouter, BackgroundTasks, Body, Depends, status
 from fastapi.responses import JSONResponse
 from pydantic import UUID4
 from sqlalchemy.orm import Session
-
+from sqlalchemy.ext.asyncio import AsyncSession
 from ..dependencies import (get_admin_user_and_db, get_current_user_and_db,
                             get_db)
 from ..schemas.auth_schema import Token
@@ -15,14 +15,15 @@ from ..utils.email import send_welcome_email
 
 router = APIRouter(prefix="/users", tags=["Users"])
 
-DB_Depndancy = Annotated[Session, Depends(get_db)]
+
+DB_Depndancy = Annotated[AsyncSession, Depends(get_db)]  # Async DB session
 
 USER_DB_Dependancy = Annotated[
-    tuple[UserDetailedOutput, Session], Depends(get_current_user_and_db)
+    tuple[UserDetailedOutput, AsyncSession], Depends(get_current_user_and_db)
 ]
 
 ADMIN_USER_DB_Dependancy = Annotated[
-    tuple[UserDetailedOutput, Session], Depends(get_admin_user_and_db)
+    tuple[UserDetailedOutput, AsyncSession], Depends(get_admin_user_and_db)
 ]
 
 
@@ -34,7 +35,7 @@ ADMIN_USER_DB_Dependancy = Annotated[
     description="Creates a new user account with the provided user input.",
     response_description="Details of the newly created user.",
 )
-def create_user(
+async def create_user(
     data: Annotated[
         UserInput,
         Body(
@@ -46,7 +47,7 @@ def create_user(
     backgroundtask: BackgroundTasks,
 ):
     _service = UserService(db, backgroundtask)
-    return _service.create(data)
+    return await _service.create(data)
 
 
 @router.get(
@@ -60,7 +61,7 @@ def create_user(
 async def get_users(user_db: USER_DB_Dependancy, background_tasks: BackgroundTasks):
     user, db = user_db
     _service = UserService(db)
-    return _service.get_all(user.role)
+    return await _service.get_all(user.role)
 
 
 @router.patch(
@@ -71,10 +72,10 @@ async def get_users(user_db: USER_DB_Dependancy, background_tasks: BackgroundTas
     description="Update the profile details of the currently authenticated user.",
     response_description="Updated user profile information.",
 )
-def update_user(data: UpdateUser, user_db: USER_DB_Dependancy):
+async def update_user(data: UpdateUser, user_db: USER_DB_Dependancy):
     user, db = user_db
     _service = UserService(db)
-    return _service.update_user(user.username, data=data)
+    return await _service.update_user(user.username, data=data)
 
 
 @router.get(
@@ -85,11 +86,11 @@ def update_user(data: UpdateUser, user_db: USER_DB_Dependancy):
     description="Retrieve the profile information of the currently authenticated user.",
     response_description="Detailed user profile.",
 )
-def get_profile_details(user_db: USER_DB_Dependancy):
+async def get_profile_details(user_db: USER_DB_Dependancy):
     user, db = user_db
     _service = UserService(db)
     print(user.id)
-    return _service.get(user.id)
+    return await _service.get(user.id)
 
 
 @router.get(
@@ -100,10 +101,10 @@ def get_profile_details(user_db: USER_DB_Dependancy):
     description="Fetch a user's profile by their username. Access depends on requester’s role.",
     response_description="User profile matching the given username.",
 )
-def get_user_username(username: str, user_db: USER_DB_Dependancy):
+async def get_user_username(username: str, user_db: USER_DB_Dependancy):
     user, db = user_db
     _service = UserService(db)
-    return _service.get_by_username(user.role, username)
+    return await _service.get_by_username(user.role, username)
 
 
 @router.get(
@@ -115,10 +116,10 @@ def get_user_username(username: str, user_db: USER_DB_Dependancy):
     response_description="User details for the given ID.",
     deprecated=True,
 )
-def get_user_by_id(id: UUID4, user_db: USER_DB_Dependancy):
+async def get_user_by_id(id: UUID4, user_db: USER_DB_Dependancy):
     _, db = user_db
     _service = UserService(db)
-    return _service.get(id)
+    return await _service.get(id)
 
 
 @router.delete(
@@ -129,7 +130,7 @@ def get_user_by_id(id: UUID4, user_db: USER_DB_Dependancy):
     description="Deletes a user by ID. Only accessible to admins.",
     response_description="No content returned after successful deletion.",
 )
-def delete_user(id: UUID4, user_db: ADMIN_USER_DB_Dependancy):
+async def delete_user(id: UUID4, user_db: ADMIN_USER_DB_Dependancy):
     _, db = user_db
     _service = UserService(db)
-    return _service.delete_user(id)
+    await _service.delete_user(id)

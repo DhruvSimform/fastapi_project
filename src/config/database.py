@@ -1,23 +1,36 @@
-from sqlalchemy import create_engine
+from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
 from .settings import settings
 
-engine = create_engine(
-    settings.DATABASE_URL,
-    echo=True,  # Enable SQL query logging
-    pool_size=3,  # 3 connections per worker → 4×3 = 12
-    max_overflow=1,  # Up to 1 extra per worker if needed → max 4 more = 16
-    pool_timeout=30,  # Wait time for a free connection
-    pool_pre_ping=True,  # Ensures stale connections are reused
+# ✅ Make sure the URL uses asyncpg driver
+# e.g. postgresql+asyncpg://user:pass@host/db
+DATABASE_URL = settings.DATABASE_URL.replace("postgresql://", "postgresql+asyncpg://")
+
+# Create async engine
+async_engine = create_async_engine(
+    DATABASE_URL,
+    echo=True,
+    pool_size=3,
+    max_overflow=1,
+    pool_timeout=30,
+    pool_pre_ping=True,
 )
 
+# Base for your models
 Base = declarative_base()
 
-SessionLocal = sessionmaker(bind=engine, autoflush=False, autocommit=False)
+# Async session factory
+AsyncSessionLocal = sessionmaker(
+    bind=async_engine,
+    class_=AsyncSession,
+    expire_on_commit=False,
+    autoflush=False,
+    autocommit=False,
+)
 
-
-def get_db():
-    with SessionLocal() as db:
-        yield db
+# Dependency for FastAPI routes
+async def get_db() -> AsyncSession:
+    async with AsyncSessionLocal() as session:
+        yield session

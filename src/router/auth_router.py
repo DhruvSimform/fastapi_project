@@ -1,7 +1,7 @@
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, Form, status
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..dependencies import get_current_user_and_db, get_db
 from ..schemas.auth_schema import RefreshToken, Token
@@ -10,9 +10,9 @@ from ..service.auth_services import AuthService
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])
 
-DB_Dependency = Annotated[Session, Depends(get_db)]
+DB_Dependency = Annotated[AsyncSession, Depends(get_db)]
 USER_DB_Dependency = Annotated[
-    tuple[UserOutput, Session], Depends(get_current_user_and_db)
+    tuple[UserOutput, AsyncSession], Depends(get_current_user_and_db)
 ]
 
 
@@ -32,9 +32,9 @@ USER_DB_Dependency = Annotated[
 - **401**: Invalid credentials.
 """,
 )
-def login_user(data: Annotated[UserLogin, Form()], db: DB_Dependency):
+async def login_user(data: Annotated[UserLogin, Form()], db: DB_Dependency):
     _service = AuthService(db)
-    return _service.login_for_token(data)
+    return await _service.login_for_token(data)
 
 
 @router.post(
@@ -52,5 +52,5 @@ def login_user(data: Annotated[UserLogin, Form()], db: DB_Dependency):
 - **401**: Invalid or expired refresh token.
 """,
 )
-def refresh_access_token(token: RefreshToken):
+async def refresh_access_token(token: RefreshToken):
     return AuthService.refresh_access_token(token.refresh_token)

@@ -1,6 +1,7 @@
 from datetime import datetime
 
 from sqlalchemy.orm import Session
+from sqlalchemy import select
 
 from ..models.user_model import User
 from ..schemas.user_schema import UserDetailedOutput, UserLogin
@@ -16,10 +17,11 @@ class AuthRepository:
     def __init__(self, db: Session):
         self.db = db
 
-    def authenticate_user(self, data: UserLogin) -> UserDetailedOutput | bool:
-        user = self.db.query(User).filter_by(username=data.username).first()
+    async def authenticate_user(self, data: UserLogin) -> UserDetailedOutput | bool:
+        result = await self.db.execute(select(User).filter_by(username=data.username))
+        user = result.scalar_one_or_none()
         if not user or not verify_password(data.password, user.hash_password):
             return False
         user.last_login = datetime.now()
-        self.db.commit()
+        await self.db.commit()
         return user

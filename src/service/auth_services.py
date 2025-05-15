@@ -1,5 +1,5 @@
 from fastapi import HTTPException, status
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..repository.auth_repository import AuthRepository
 from ..schemas.auth_schema import RefreshToken, Token
@@ -13,13 +13,13 @@ class AuthService:
     AuthService class provides authentication-related services, including user login and token management.
     """
 
-    def __init__(self, db: Session):
+    def __init__(self, db: AsyncSession):
         self.repository = AuthRepository(db)
 
-    def login_for_token(self, data: AuthInput) -> Token:
+    async def login_for_token(self, data: AuthInput) -> Token:
         """Authenticate user and generate tokens."""
 
-        user = self.repository.authenticate_user(data)
+        user = await self.repository.authenticate_user(data)
         if not user:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,

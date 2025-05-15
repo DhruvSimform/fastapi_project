@@ -6,44 +6,51 @@ from ..repository.todo_repository import TodoRepository
 from ..schemas.toso_shcema import TodoInput, TodoOutput, TodoUpdate
 
 
-class TodoServices:
-    """Service layer for handling Todo-related business logic."""
+from fastapi import HTTPException, status
 
-    def __init__(self, db: Session):
+from sqlalchemy.ext.asyncio import AsyncSession
+
+class TodoServices:
+    """Async service layer for handling Todo-related business logic."""
+
+    def __init__(self, db: AsyncSession):
         self.repository = TodoRepository(db)
 
-    def create_todo_for__user(self, _created_by: UUID4, data: TodoInput) -> TodoOutput:
+    async def create_todo_for_user(self, _created_by: UUID4, data: TodoInput) -> TodoOutput:
         """Create a new todo item for the specified user."""
-        return self.repository.create(_created_by, data)
+        return await self.repository.create(_created_by, data)
 
-    def get_list_of_todo_by_user(self, _created_by: UUID4) -> list[TodoOutput]:
+    async def get_list_of_todo_by_user(self, _created_by: UUID4) -> list[TodoOutput]:
         """Retrieve a list of todos created by a specific user."""
-        return self.repository.get_todos_by_created_user(_created_by)
+        return await self.repository.get_todos_by_created_user(_created_by)
 
-    def get_single_todo(self, _id: UUID4) -> TodoOutput:
+    async def get_single_todo(self, _id: UUID4) -> TodoOutput:
         """Retrieve a single todo by its ID."""
-        return self.repository.get_single_todo(_id)
+        return await self.repository.get_single_todo(_id)
 
-    def get_single_todo_by_user(self, user_id, _id: UUID4) -> TodoOutput:
+    async def get_single_todo_by_user(self, user_id: UUID4, _id: UUID4) -> TodoOutput:
         """Retrieve a single todo by ID and verify ownership by user."""
-        if not self.repository.exists_todo_by_id_user(user_id, _id):
+        exists = await self.repository.exists_todo_by_id_user(user_id, _id)
+        if not exists:
             raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, detail="Todo does not exists"
+                status_code=status.HTTP_404_NOT_FOUND, detail="Todo does not exist"
             )
-        return self.repository.get_single_todo(_id)
+        return await self.repository.get_single_todo(_id)
 
-    def delete_todo(self, user_id, _id: UUID4) -> None:
+    async def delete_todo(self, user_id: UUID4, _id: UUID4) -> None:
         """Delete a todo if it exists and belongs to the user."""
-        if not self.repository.exists_todo_by_id_user(user_id, _id):
+        exists = await self.repository.exists_todo_by_id_user(user_id, _id)
+        if not exists:
             raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, detail="Todo does not exists"
+                status_code=status.HTTP_404_NOT_FOUND, detail="Todo does not exist"
             )
-        return self.repository.delete_todo_by_id(_id)
+        await self.repository.delete_todo_by_id(_id)
 
-    def update_todo(self, user_id, _id: UUID4, data: TodoUpdate) -> None:
+    async def update_todo(self, user_id: UUID4, _id: UUID4, data: TodoUpdate) -> None:
         """Update a todo if it exists and belongs to the user."""
-        if not self.repository.exists_todo_by_id_user(user_id, _id):
+        exists = await self.repository.exists_todo_by_id_user(user_id, _id)
+        if not exists:
             raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, detail="Todo does not exists"
+                status_code=status.HTTP_404_NOT_FOUND, detail="Todo does not exist"
             )
-        return self.repository.update_todo_by_id(_id, data)
+        await self.repository.update_todo_by_id(_id, data)

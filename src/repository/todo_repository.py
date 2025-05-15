@@ -5,74 +5,77 @@ from ..models.todo_models import ToDo
 from ..schemas.toso_shcema import TodoInput, TodoOutput, TodoUpdate
 
 
+from sqlalchemy.future import select
+from sqlalchemy import delete, update
+from sqlalchemy.ext.asyncio import AsyncSession
+
 class TodoRepository:
     """
-    Repository class for managing ToDo operations with the database.
+    Repository class for managing ToDo operations with the database (async version).
     """
 
-    def __init__(self, db: Session):
+    def __init__(self, db: AsyncSession):
         self.db = db
 
-    def create(self, user_id: UUID4, data: TodoInput) -> TodoOutput:
+    async def create(self, user_id: UUID4, data: TodoInput) -> TodoOutput:
         """
         Creates a new ToDo item for the specified user and returns the created item.
         """
-
         todo = ToDo(**data.model_dump(), created_by=user_id)
         self.db.add(todo)
-        self.db.commit()
-        self.db.refresh(todo)
+        await self.db.commit()
+        await self.db.refresh(todo)
         return todo
 
-    def get_todos_by_created_user(self, _created_by: UUID4) -> list[TodoOutput]:
+    async def get_todos_by_created_user(self, _created_by: UUID4) -> list[TodoOutput]:
         """
         Retrieve a list of todos created by a specific user.
         """
+        result = await self.db.execute(select(ToDo).filter_by(created_by=_created_by))
+        todos = result.scalars().all()
+        return todos
 
-        return self.db.query(ToDo).filter_by(created_by=_created_by).all()
-
-    def get_todos(self) -> list[TodoOutput]:
+    async def get_todos(self) -> list[TodoOutput]:
         """
         Retrieve all todo items from the database.
         """
+        result = await self.db.execute(select(ToDo))
+        todos = result.scalars().all()
+        return todos
 
-        return self.db.query(ToDo).all()
-
-    def get_single_todo(self, _id: int) -> TodoOutput:
+    async def get_single_todo(self, _id: int) -> TodoOutput | None:
         """
         Retrieve a single todo item by its ID.
         """
+        result = await self.db.execute(select(ToDo).filter_by(id=_id))
+        todo = result.scalar_one_or_none()
+        return todo
 
-        return self.db.query(ToDo).filter_by(id=_id).first()
-
-    def exists_todo_by_id_user(self, user_id: UUID4, _id: int) -> bool:
+    async def exists_todo_by_id_user(self, user_id: UUID4, _id: int) -> bool:
         """
         Checks if a ToDo item exists for a given user ID and ToDo ID.
         """
-
-        return (
-            self.db.query(ToDo)
-            .filter(ToDo.id == _id, ToDo.created_by == user_id)
-            .first()
-            is not None
+        result = await self.db.execute(
+            select(ToDo).filter(ToDo.id == _id, ToDo.created_by == user_id)
         )
+        todo = result.scalar_one_or_none()
+        return todo is not None
 
-    def delete_todo_by_id(self, _id: int) -> None:
+    async def delete_todo_by_id(self, _id: int) -> None:
         """
         Deletes a ToDo item from the database by its ID.
         """
+        await self.db.execute(delete(ToDo).filter_by(id=_id))
+        await self.db.commit()
 
-        self.db.query(ToDo).filter_by(id=_id).delete()
-        self.db.commit()
-        return None
-
-    def update_todo_by_id(self, _id: int, data: TodoUpdate) -> TodoOutput:
+    async def update_todo_by_id(self, _id: int, data: TodoUpdate) -> TodoOutput | None:
         """
         Update a todo item by its ID with the provided data.
         """
-
-        todo = self.db.query(ToDo).filter_by(id=_id)
-        data = data.model_dump(exclude_unset=True)
-        todo.update(data)
-        self.db.commit()
-        return todo.first()
+        data_dict = data.model_dump(exclude_unset=True)
+        await self.db.execute(update(ToDo).where(ToDo.id == _id).values(**data_dict))
+        await self.db.commit()
+        # Fetch updated todo
+        result = await self.db.execute(select(ToDo).filter_by(id=_id))
+        todo = result.scalar_one_or_none()
+        return todo

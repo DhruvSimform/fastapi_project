@@ -7,7 +7,7 @@ from fastapi.staticfiles import StaticFiles
 
 from src.config.settings import STATIC_DIR, settings
 from src.router import auth_router, template_routes, todo_router, user_router
-from src.utils.init_db import create_table
+from src.utils.init_db import create_tables
 
 app = FastAPI(
     title="FastAPI Project - User & Todo Management",
@@ -66,7 +66,9 @@ if STATIC_DIR.exists():
     app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 
 
-create_table()
+@app.on_event("startup")
+async def on_startup():
+    await create_tables()
 
 app.include_router(auth_router.router)
 app.include_router(user_router.router)

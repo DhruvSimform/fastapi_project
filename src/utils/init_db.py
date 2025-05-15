@@ -1,9 +1,6 @@
-from ..config.database import Base, engine
+from ..config.database import Base, async_engine 
 
 
-def create_table():
-    """
-    create All database tables defined in application
-    """
-
-    Base.metadata.create_all(bind=engine)
+async def create_tables():
+    async with async_engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
