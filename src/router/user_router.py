@@ -12,7 +12,7 @@ from ..schemas.user_schema import (UpdateUser, UserDetailedOutput, UserInput,
                                    UserOutput)
 from ..service.users_services import UserService
 from ..utils.email import send_welcome_email
-
+import time
 router = APIRouter(prefix="/users", tags=["Users"])
 
 DB_Depndancy = Annotated[Session, Depends(get_db)]
@@ -57,9 +57,10 @@ def create_user(
     description="Fetch a list of all users. Accessible based on user role.",
     response_description="A list of users.",
 )
-async def get_users(user_db: USER_DB_Dependancy, background_tasks: BackgroundTasks):
+def get_users(user_db: USER_DB_Dependancy, background_tasks: BackgroundTasks):
     user, db = user_db
     _service = UserService(db)
+    time.sleep(30)
     return _service.get_all(user.role)
 
 
