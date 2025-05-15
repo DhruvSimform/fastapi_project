@@ -100,5 +100,5 @@ class TodoUpdate(Todo):
         None,
         title="Status",
         description="Updated task status (optional).",
-        example="in_progress",
+        example="inprogress",
     )
