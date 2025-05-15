@@ -1,13 +1,14 @@
 from datetime import datetime
 
 from sqlalchemy import (UUID, Column, Date, DateTime, Enum, ForeignKey,
-                        Integer, String, Text, func )
+                        Integer, String, Text, func)
 from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.orm import relationship
 
 from ..config.constant import ToDoStatus
 from ..config.database import Base
 from ..models.user_model import User
-from sqlalchemy.orm import relationship
+
 
 class ToDo(Base):
 
@@ -23,10 +24,9 @@ class ToDo(Base):
     created_at = Column(DateTime, default=datetime.now())
     updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now())
 
-    created_by = Column(UUID, ForeignKey(User.id , ondelete="CASCADE"), nullable=False )
+    created_by = Column(UUID, ForeignKey(User.id, ondelete="CASCADE"), nullable=False)
 
     created_by_user = relationship("User", back_populates="todos", passive_deletes=True)
-
 
     @hybrid_property
     def is_overdue(self) -> bool:

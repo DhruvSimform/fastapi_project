@@ -4,13 +4,13 @@ from pydantic import EmailStr
 from ..config.email_config import conf
 from ..config.settings import settings
 from .template_engine import templates
-from ..config.settings import settings
+
 
 async def send_welcome_email(to_email: EmailStr, username: str):
     message = MessageSchema(
         subject=f"Welcome to FastAPI Project, {username}",
         recipients=[to_email],
-        template_body={"username": username , "domain":settings.PROJECT_DOMAIN},
+        template_body={"username": username, "domain": settings.PROJECT_DOMAIN},
         subtype="html",
     )
 

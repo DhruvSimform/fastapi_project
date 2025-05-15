@@ -48,7 +48,7 @@ class UserInput(User):
         default=UserRole.user,
         title="User Role",
         description="Role of the user. Either 'user' or 'admin'.",
-        examples=["user","admin"],
+        examples=["user", "admin"],
     )
     first_name: str | None = Field(
         None,

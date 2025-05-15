@@ -1,16 +1,13 @@
+import logging
+import time
+
 import uvicorn
-
-from fastapi import FastAPI
-
+from fastapi import FastAPI, Request
 from fastapi.staticfiles import StaticFiles
-
 
 from src.config.settings import STATIC_DIR, settings
 from src.router import auth_router, template_routes, todo_router, user_router
 from src.utils.init_db import create_table
-
-
-from fastapi import FastAPI
 
 app = FastAPI(
     title="FastAPI Project - User & Todo Management",
@@ -78,6 +75,27 @@ app.include_router(todo_router.router)
 app.include_router(template_routes.router)
 
 
+# Configure logger only if needed (optional)
+logger = logging.getLogger("process_time")
+logger.setLevel(logging.INFO)
+
+
+# Function-based middleware: fastest way
+@app.middleware("http")
+async def process_time_middleware(request: Request, call_next):
+    start = time.perf_counter()
+
+    response = await call_next(request)
+
+    duration_ms = round((time.perf_counter() - start) * 1000, 2)
+    response.headers["X-Process-Time"] = f"{duration_ms} ms"
+
+    # Logging optional: comment out to save performance
+    print("-------------------------------------------------------")
+    print(f"{request.method} {request.url.path} - {duration_ms} ms")
+    logger.info(f"{request.method} {request.url.path} - {duration_ms} ms")
+
+    return response
 
 
 def main():
