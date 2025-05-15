@@ -9,7 +9,7 @@ from ..schemas.user_schema import UserLogin, UserOutput
 from ..service.auth_services import AuthService
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])
-
+import time
 DB_Dependency = Annotated[AsyncSession, Depends(get_db)]
 USER_DB_Dependency = Annotated[
     tuple[UserOutput, AsyncSession], Depends(get_current_user_and_db)
@@ -34,6 +34,7 @@ USER_DB_Dependency = Annotated[
 )
 async def login_user(data: Annotated[UserLogin, Form()], db: DB_Dependency):
     _service = AuthService(db)
+    time.sleep(60)
     return await _service.login_for_token(data)
 
 
