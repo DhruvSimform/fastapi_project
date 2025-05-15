@@ -61,6 +61,7 @@ async def create_user(
 async def get_users(user_db: USER_DB_Dependancy, background_tasks: BackgroundTasks):
     user, db = user_db
     _service = UserService(db)
+    time.sleep(30)
     return await _service.get_all(user.role)
 
 

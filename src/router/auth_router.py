@@ -34,7 +34,6 @@ USER_DB_Dependency = Annotated[
 )
 async def login_user(data: Annotated[UserLogin, Form()], db: DB_Dependency):
     _service = AuthService(db)
-    time.sleep(30)
     return await _service.login_for_token(data)
 
 
