@@ -8,6 +8,7 @@ from sqlalchemy.ext.hybrid import hybrid_property
 
 from ..config.database import Base
 
+from sqlalchemy.orm import relationship
 
 class User(Base):
     __tablename__ = "users"
@@ -35,6 +36,9 @@ class User(Base):
     bio = Column(String(length=255), nullable=True)
     profile_picture_url = Column(String, nullable=True)
     last_login = Column(DateTime, nullable=True)
+
+    todos = relationship("ToDo", back_populates="created_by_user", cascade="all, delete-orphan", passive_deletes=True)
+
 
     @hybrid_property
     def full_name(self):
