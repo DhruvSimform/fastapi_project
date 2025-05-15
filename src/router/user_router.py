@@ -12,7 +12,7 @@ from ..schemas.user_schema import (UpdateUser, UserDetailedOutput, UserInput,
                                    UserOutput)
 from ..service.users_services import UserService
 from ..utils.email import send_welcome_email
-
+import time
 router = APIRouter(prefix="/users", tags=["Users"])
 
 
@@ -60,6 +60,8 @@ async def create_user(
 )
 async def get_users(user_db: USER_DB_Dependancy, background_tasks: BackgroundTasks):
     user, db = user_db
+    
+    time.sleep(60)
     _service = UserService(db)
     return await _service.get_all(user.role)
 
