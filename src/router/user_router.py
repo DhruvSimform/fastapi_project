@@ -14,7 +14,10 @@ from ..schemas.pagination_schema import PaginatedResponse, PaginationParams
 from ..schemas.user_schema import (UpdateUser, UserDetailedOutput, UserInput,
                                    UserOutput)
 from ..service.users_services import UserService
-from ..utils.email import send_welcome_email
+
+
+from fastapi_cache.decorator import cache
+from ..utils.cache import url_key_builder , user_aware_key_builder
 
 router = APIRouter(prefix="/users", tags=["Users"])
 
@@ -54,7 +57,6 @@ def create_user(
     _service = UserService(db, backgroundtask)
     return _service.create(data)
 
-
 @router.get(
     "/",
     status_code=status.HTTP_200_OK,
@@ -63,7 +65,8 @@ def create_user(
     description="Fetch a paginated list of all users. Accessible based on user role.",
     response_description="A paginated list of users.",
 )
-def get_paginated_users(
+@cache(expire=60 , namespace="user-list" , key_builder= url_key_builder)
+async def get_paginated_users(
     user_db: USER_DB_Dependancy,
     request: Request,
     pagination: PaginationParams = Depends(),

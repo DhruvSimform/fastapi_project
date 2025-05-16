@@ -25,6 +25,12 @@ class Settings(BaseSettings):
     # Database settings
     DATABASE_URL: str  # Reading the database URL from environment
 
+    #redish settings
+    REDIS_HOST: str
+    REDIS_PORT: int
+    REDIS_PASSWORD: str
+    REDIS_SSL: bool
+
     # JWT Auth Settings
     SECRET_KEY: str
     ALGORITHM: str = "HS256"
