@@ -11,6 +11,12 @@ from src.utils.init_db import create_table
 
 from src.utils.intit_redish import startup
 
+from src.utils.rate_limiter import limiter
+
+from slowapi.middleware import SlowAPIMiddleware
+from slowapi.errors import RateLimitExceeded
+from slowapi import _rate_limit_exceeded_handler
+
 app = FastAPI(
     title="FastAPI Project - User & Todo Management",
     description=(
@@ -136,6 +142,10 @@ app.include_router(todo_router.router)
 
 app.include_router(template_routes.router)
 
+# Register rate limiter middleware and error handler
+app.state.limiter = limiter
+app.add_middleware(SlowAPIMiddleware)
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 # Configure logger only if needed (optional)
 logger = logging.getLogger("process_time")

@@ -18,6 +18,7 @@ from ..service.users_services import UserService
 
 from fastapi_cache.decorator import cache
 from ..utils.cache import url_key_builder , user_aware_key_builder
+from ..utils.rate_limiter import limiter
 
 router = APIRouter(prefix="/users", tags=["Users"])
 
@@ -66,19 +67,21 @@ def create_user(
     response_description="A paginated list of users.",
 )
 # @cache(expire=60 , namespace="user-list" , key_builder= url_key_builder)
+@limiter.limit("20/minute")
 async def get_paginated_users(
-    user_db: USER_DB_Dependancy,
+    # user_db: USER_DB_Dependancy,
+    db : DB_Depndancy,
     request: Request,
     pagination: PaginationParams = Depends(),
 ):
-    user, db = user_db
+    # user, db = user_db
     _service = UserService(db)
     return _service.get_all_by_page(
         request=request,
-        user_role=user.role,
+        user_role='user',
         page=pagination.page,
         limit=pagination.limit,
-    )
+)
 
 
 @router.get(
