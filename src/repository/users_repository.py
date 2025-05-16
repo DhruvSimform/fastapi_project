@@ -65,7 +65,7 @@ class UserRepository:
             User.bio,
             User.full_name,
             User.last_login
-        ).yield_per(100)  # Stream in batches of 100
+        ).yield_per(1000)  # Stream in batches of 100
 
         for row in query:
             yield UserOutput(
