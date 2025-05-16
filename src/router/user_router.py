@@ -65,7 +65,7 @@ def create_user(
     description="Fetch a paginated list of all users. Accessible based on user role.",
     response_description="A paginated list of users.",
 )
-@cache(expire=60 , namespace="user-list" , key_builder= url_key_builder)
+# @cache(expire=60 , namespace="user-list" , key_builder= url_key_builder)
 async def get_paginated_users(
     user_db: USER_DB_Dependancy,
     request: Request,
