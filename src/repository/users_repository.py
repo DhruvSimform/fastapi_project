@@ -5,8 +5,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from ..models.user_model import User
-from ..schemas.user_schema import (UpdateUser, UserDetailedOutput, UserInput,
-                                   UserOutput)
+from ..schemas.user_schema import UpdateUser, UserDetailedOutput, UserInput, UserOutput
 from ..utils.password_helper import get_password_hash
 
 

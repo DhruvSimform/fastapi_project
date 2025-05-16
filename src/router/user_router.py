@@ -1,23 +1,18 @@
 import json
 from typing import Annotated
 
-from fastapi import (APIRouter, BackgroundTasks, Body, Depends, Query, Request,
-                     status)
+from fastapi import APIRouter, BackgroundTasks, Body, Depends, Query, Request, status
 from fastapi.responses import JSONResponse, StreamingResponse
+from fastapi_cache.decorator import cache
 from pydantic import UUID4
 from sqlalchemy.orm import Session
 
-from ..dependencies import (get_admin_user_and_db, get_current_user_and_db,
-                            get_db)
+from ..dependencies import get_admin_user_and_db, get_current_user_and_db, get_db
 from ..schemas.auth_schema import Token
 from ..schemas.pagination_schema import PaginatedResponse, PaginationParams
-from ..schemas.user_schema import (UpdateUser, UserDetailedOutput, UserInput,
-                                   UserOutput)
+from ..schemas.user_schema import UpdateUser, UserDetailedOutput, UserInput, UserOutput
 from ..service.users_services import UserService
-
-
-from fastapi_cache.decorator import cache
-from ..utils.cache import url_key_builder , user_aware_key_builder
+from ..utils.cache import url_key_builder, user_aware_key_builder
 from ..utils.rate_limiter import limiter
 
 router = APIRouter(prefix="/users", tags=["Users"])
@@ -58,6 +53,7 @@ def create_user(
     _service = UserService(db, backgroundtask)
     return _service.create(data)
 
+
 @router.get(
     "/",
     status_code=status.HTTP_200_OK,
@@ -70,7 +66,7 @@ def create_user(
 @limiter.limit("20/minute")
 async def get_paginated_users(
     # user_db: USER_DB_Dependancy,
-    db : DB_Depndancy,
+    db: DB_Depndancy,
     request: Request,
     pagination: PaginationParams = Depends(),
 ):
@@ -78,10 +74,10 @@ async def get_paginated_users(
     _service = UserService(db)
     return _service.get_all_by_page(
         request=request,
-        user_role='user',
+        user_role="user",
         page=pagination.page,
         limit=pagination.limit,
-)
+    )
 
 
 @router.get(

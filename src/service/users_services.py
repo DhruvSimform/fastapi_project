@@ -6,8 +6,13 @@ from sqlalchemy.orm import Session
 
 from ..repository.users_repository import UserRepository
 from ..schemas.pagination_schema import PaginatedResponse, PaginationParams
-from ..schemas.user_schema import (UpdateUser, UserDetailedOutput, UserInput,
-                                   UserOutput, UserRole)
+from ..schemas.user_schema import (
+    UpdateUser,
+    UserDetailedOutput,
+    UserInput,
+    UserOutput,
+    UserRole,
+)
 from ..utils.email import send_welcome_email
 
 

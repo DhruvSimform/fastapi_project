@@ -1,10 +1,12 @@
-from slowapi import Limiter
-from fastapi import Request
-from ..config.settings import settings
 import jwt
+from fastapi import Request
+from slowapi import Limiter
+
+from ..config.settings import settings
 
 SECRET_KEY = settings.SECRET_KEY
 ALGORITHM = settings.ALGORITHM
+
 
 def hybrid_key_func(request: Request):
     auth_header = request.headers.get("Authorization")
@@ -19,8 +21,9 @@ def hybrid_key_func(request: Request):
             pass  # fall back to IP
     return f"ip:{request.client.host}"
 
+
 # Initialize limiter with custom key function
 limiter = Limiter(
     key_func=hybrid_key_func,
-    default_limits=["100/minute"],  
+    default_limits=["100/minute"],
 )

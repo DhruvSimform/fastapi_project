@@ -4,8 +4,7 @@ from sqlalchemy.orm import Session
 from ..repository.auth_repository import AuthRepository
 from ..schemas.auth_schema import RefreshToken, Token
 from ..schemas.user_schema import UserLogin as AuthInput
-from ..utils.auth import (create_access_token, create_refresh_token,
-                          verify_token)
+from ..utils.auth import create_access_token, create_refresh_token, verify_token
 
 
 class AuthService:

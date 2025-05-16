@@ -4,18 +4,15 @@ import time
 import uvicorn
 from fastapi import FastAPI, Request
 from fastapi.staticfiles import StaticFiles
+from slowapi import _rate_limit_exceeded_handler
+from slowapi.errors import RateLimitExceeded
+from slowapi.middleware import SlowAPIMiddleware
 
 from src.config.settings import STATIC_DIR, settings
 from src.router import auth_router, template_routes, todo_router, user_router
 from src.utils.init_db import create_table
-
 from src.utils.intit_redish import startup
-
 from src.utils.rate_limiter import limiter
-
-from slowapi.middleware import SlowAPIMiddleware
-from slowapi.errors import RateLimitExceeded
-from slowapi import _rate_limit_exceeded_handler
 
 app = FastAPI(
     title="FastAPI Project - User & Todo Management",
@@ -78,11 +75,13 @@ create_table()
 
 from contextlib import asynccontextmanager
 
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     await startup()  # Call the startup function
     yield
     # Add any cleanup logic here if needed
+
 
 app = FastAPI(
     title="FastAPI Project - User & Todo Management",

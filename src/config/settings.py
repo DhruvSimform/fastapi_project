@@ -25,7 +25,7 @@ class Settings(BaseSettings):
     # Database settings
     DATABASE_URL: str  # Reading the database URL from environment
 
-    #redish settings
+    # redish settings
     REDIS_HOST: str
     REDIS_PORT: int
     REDIS_PASSWORD: str
