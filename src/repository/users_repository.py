@@ -1,4 +1,4 @@
-from typing import Annotated, List
+from typing import Annotated, List , Generator
 
 from pydantic import UUID4
 from sqlalchemy import select
@@ -48,6 +48,8 @@ class UserRepository:
         return self.db.query(
             User.username, User.email, User.bio, User.full_name, User.last_login
         ).all()
+    
+    
 
     def get_user(self, _id: UUID4) -> UserDetailedOutput | None:
         """
@@ -56,6 +58,23 @@ class UserRepository:
 
         return self.db.query(User).filter_by(id=_id).first()
 
+    def stream_all_users(self) -> Generator[UserOutput, None, None]:
+        query = self.db.query(
+            User.username,
+            User.email,
+            User.bio,
+            User.full_name,
+            User.last_login
+        ).yield_per(100)  # Stream in batches of 100
+
+        for row in query:
+            yield UserOutput(
+                username=row.username,
+                email=row.email,
+                bio=row.bio,
+                full_name=row.full_name,
+                last_login=row.last_login,
+            )
     def get_user_by_username(self, _username: str) -> UserOutput | None:
         """
         Retrieve a user's details by their username.

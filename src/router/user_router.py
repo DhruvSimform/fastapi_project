@@ -12,6 +12,10 @@ from ..schemas.user_schema import (UpdateUser, UserDetailedOutput, UserInput,
                                    UserOutput)
 from ..service.users_services import UserService
 from ..utils.email import send_welcome_email
+
+
+from fastapi.responses import StreamingResponse
+import json
 router = APIRouter(prefix="/users", tags=["Users"])
 
 DB_Depndancy = Annotated[Session, Depends(get_db)]
@@ -61,6 +65,28 @@ def get_users(user_db: USER_DB_Dependancy, background_tasks: BackgroundTasks):
     _service = UserService(db)
     return _service.get_all(user.role)
 
+
+@router.get(
+    "/stream",
+    status_code=status.HTTP_200_OK,
+    summary="Stream all users",
+    description="Efficiently stream all users in a JSON array.",
+    response_description="A JSON array of users.",
+)
+def get_users(db: DB_Depndancy):
+    service = UserService(db)
+
+    def user_generator():
+        yield '['
+        first = True
+        for user_obj in service.get_all_stream():
+            if not first:
+                yield ','
+            yield json.dumps(user_obj.dict())
+            first = False
+        yield ']'
+
+    return StreamingResponse(user_generator(), media_type="application/json")
 
 @router.patch(
     "/me",

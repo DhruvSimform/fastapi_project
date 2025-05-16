@@ -7,7 +7,7 @@ from ..schemas.user_schema import (UpdateUser, UserDetailedOutput, UserInput,
                                    UserOutput, UserRole)
 from ..utils.email import send_welcome_email
 
-
+from typing import Generator
 class UserService:
     """Service layer for handling user-related business logic."""
 
@@ -31,6 +31,10 @@ class UserService:
         if user_role == UserRole.admin:
             return self.repository.get_all_users_admin()
         return self.repository.get_all_users()
+    
+
+    def get_all_stream(self) -> Generator[UserOutput, None, None]:
+        return self.repository.stream_all_users()
 
     def get(self, _id: UUID4) -> UserDetailedOutput:
         """Get user details by ID if the user exists."""
