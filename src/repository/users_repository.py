@@ -1,4 +1,4 @@
-from typing import Annotated, List , Generator
+from typing import Annotated, Generator, List
 
 from pydantic import UUID4
 from sqlalchemy import select
@@ -48,8 +48,24 @@ class UserRepository:
         return self.db.query(
             User.username, User.email, User.bio, User.full_name, User.last_login
         ).all()
-    
-    
+
+    def get_total_user_count(self) -> int:
+        return self.db.query(User).count()
+
+    def get_users_paginated_admin(
+        self, skip: int, limit: int
+    ) -> list[UserDetailedOutput]:
+        return self.db.query(User).offset(skip).limit(limit).all()
+
+    def get_users_paginated(self, skip: int, limit: int) -> list[UserOutput]:
+        return (
+            self.db.query(
+                User.username, User.email, User.bio, User.full_name, User.last_login
+            )
+            .offset(skip)
+            .limit(limit)
+            .all()
+        )
 
     def get_user(self, _id: UUID4) -> UserDetailedOutput | None:
         """
@@ -60,12 +76,10 @@ class UserRepository:
 
     def stream_all_users(self) -> Generator[UserOutput, None, None]:
         query = self.db.query(
-            User.username,
-            User.email,
-            User.bio,
-            User.full_name,
-            User.last_login
-        ).yield_per(1000)  # Stream in batches of 100
+            User.username, User.email, User.bio, User.full_name, User.last_login
+        ).yield_per(
+            1000
+        )  # Stream in batches of 100
 
         for row in query:
             yield UserOutput(
@@ -75,6 +89,7 @@ class UserRepository:
                 full_name=row.full_name,
                 last_login=row.last_login,
             )
+
     def get_user_by_username(self, _username: str) -> UserOutput | None:
         """
         Retrieve a user's details by their username.

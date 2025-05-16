@@ -1,21 +1,21 @@
+import json
 from typing import Annotated
 
-from fastapi import APIRouter, BackgroundTasks, Body, Depends, status
-from fastapi.responses import JSONResponse
+from fastapi import (APIRouter, BackgroundTasks, Body, Depends, Query, Request,
+                     status)
+from fastapi.responses import JSONResponse, StreamingResponse
 from pydantic import UUID4
 from sqlalchemy.orm import Session
 
 from ..dependencies import (get_admin_user_and_db, get_current_user_and_db,
                             get_db)
 from ..schemas.auth_schema import Token
+from ..schemas.pagination_schema import PaginatedResponse, PaginationParams
 from ..schemas.user_schema import (UpdateUser, UserDetailedOutput, UserInput,
                                    UserOutput)
 from ..service.users_services import UserService
 from ..utils.email import send_welcome_email
 
-
-from fastapi.responses import StreamingResponse
-import json
 router = APIRouter(prefix="/users", tags=["Users"])
 
 DB_Depndancy = Annotated[Session, Depends(get_db)]
@@ -27,6 +27,9 @@ USER_DB_Dependancy = Annotated[
 ADMIN_USER_DB_Dependancy = Annotated[
     tuple[UserDetailedOutput, Session], Depends(get_admin_user_and_db)
 ]
+
+
+PAGINATION_QUERY_PARAM = Annotated[PaginationParams, Query()]
 
 
 @router.post(
@@ -53,14 +56,38 @@ def create_user(
 
 
 @router.get(
-    "",
+    "/",
+    status_code=status.HTTP_200_OK,
+    response_model=PaginatedResponse[UserOutput | UserDetailedOutput],
+    summary="Get all users with pagination",
+    description="Fetch a paginated list of all users. Accessible based on user role.",
+    response_description="A paginated list of users.",
+)
+def get_paginated_users(
+    user_db: USER_DB_Dependancy,
+    request: Request,
+    pagination: PaginationParams = Depends(),
+):
+    user, db = user_db
+    _service = UserService(db)
+    return _service.get_all_by_page(
+        request=request,
+        user_role=user.role,
+        page=pagination.page,
+        limit=pagination.limit,
+    )
+
+
+@router.get(
+    "/all",
     status_code=status.HTTP_200_OK,
     response_model=list[UserOutput | UserDetailedOutput],
     summary="Get all users",
     description="Fetch a list of all users. Accessible based on user role.",
     response_description="A list of users.",
+    deprecated=True,
 )
-def get_users(user_db: USER_DB_Dependancy, background_tasks: BackgroundTasks):
+def get_users(user_db: USER_DB_Dependancy):
     user, db = user_db
     _service = UserService(db)
     return _service.get_all(user.role)
@@ -77,16 +104,17 @@ def get_users(db: DB_Depndancy):
     service = UserService(db)
 
     def user_generator():
-        yield '['
+        yield "["
         first = True
         for user_obj in service.get_all_stream():
             if not first:
-                yield ','
+                yield ","
             yield json.dumps(user_obj.dict())
             first = False
-        yield ']'
+        yield "]"
 
     return StreamingResponse(user_generator(), media_type="application/json")
+
 
 @router.patch(
     "/me",
