@@ -14,12 +14,25 @@ This project showcases the features and capabilities of the FastAPI framework, w
     - Admin-only field access (e.g., last login, user ID, and role).
     - Abstract data access based on roles with query optimization.
     - Normal users have limited access to view other users' data.
+    - Retrieve all users with pagination support.
 
 - **Todo Management**:
     - Create, retrieve, update, and delete tasks for logged-in users.
         - Input validation using Pydantic.
         - PostgreSQL database integration.
         - Custom error handling.
+
+## Database Configuration
+
+The database configuration is defined with the following settings:
+
+- **`settings.DATABASE_URL`**: The connection string for the database.
+- **`echo=True`**: Enables SQL query logging for debugging purposes.
+- **`pool_size=3`**: Configures 3 connections per worker, resulting in a total of 12 connections for 4 workers.
+- **`max_overflow=1`**: Allows up to 1 additional connection per worker, providing a maximum of 16 connections.
+- **`pool_timeout=30`**: Specifies the wait time (in seconds) for a free connection before timing out.
+- **`pool_pre_ping=True`**: Ensures stale connections are checked and reused efficiently.
+
 
 ## Requirements
 
@@ -75,6 +88,8 @@ fastapi_project/
 │   ├── schemas/         # Pydantic models (request/response)
 │   ├── service/         # Business logic and service layer
 │   └── utils/           # Utility functions and helpers
+├── templates/           # HTML templates for rendering views
+├── statics/             # Static files (CSS, JS, images)
 ├── alembic/             # Database migrations folder
 ├── alembic.ini          # Alembic config file
 ├── pyproject.toml       # Project metadata and tool configs
@@ -82,6 +97,7 @@ fastapi_project/
 ├── requirements.txt     # List of Python dependencies
 ├── .gitignore           # Git ignored files/patterns
 └── README.md            # Project documentation
+```
 
 ```
 ## Contributing
