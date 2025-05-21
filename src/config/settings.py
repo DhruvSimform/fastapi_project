@@ -23,7 +23,7 @@ class Settings(BaseSettings):
     MAIL_SSL: bool = False
 
     # Database settings
-    DATABASE_URL: str  # Reading the database URL from environment
+    DATABASE_URL: str = "sqlite:///./sqlite.db" # Reading the database URL from environment
 
     # redish settings
     REDIS_HOST: str

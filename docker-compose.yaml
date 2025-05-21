@@ -1,0 +1,62 @@
+version: "3.8"
+
+services:
+  postgres_db:
+    container_name: postgres
+    image: postgres:15
+    restart: always
+
+    volumes:
+      - myvol:/var/lib/postgresql/data
+
+    networks:
+      - mynet
+    
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: todo
+    
+    ports:
+      - "5433:5432"
+
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U root"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+  
+  fastapi:
+    container_name: fastapi-app
+    build: 
+      context: .
+
+    ports:
+      - "8000:8000"
+      
+    depends_on:
+      postgres_db:
+        condition: service_healthy
+
+    environment:
+      DATABASE_URL: postgresql+psycopg2://root:root@postgres_db:5432/todo
+
+    env_file:
+      - .env
+
+    networks:
+      - mynet
+
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8000/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+
+volumes:
+  myvol:
+
+networks:
+  mynet:
