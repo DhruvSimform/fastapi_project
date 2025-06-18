@@ -11,11 +11,9 @@ from slowapi.middleware import SlowAPIMiddleware
 
 from src.config.settings import STATIC_DIR, settings
 from src.router import auth_router, template_routes, todo_router, user_router
-from src.utils.init_db import create_table
 from src.utils.intit_redish import startup
 from src.utils.rate_limiter import limiter
 
-from src.utils.alembic_upgrade import run_alembic_migrations
 
 app = FastAPI(
     title="FastAPI Project - User & Todo Management",

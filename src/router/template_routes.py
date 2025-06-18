@@ -10,5 +10,5 @@ router = APIRouter(tags=["Templates"])
 @router.get("/", response_class=HTMLResponse)
 async def welcome(request: Request):
     return templates.TemplateResponse(
-        "index.html", {"request": request, "PROJECT_DOMAIN": settings.PROJECT_DOMAIN}
+        request, "index.html", {"PROJECT_DOMAIN": settings.PROJECT_DOMAIN}
     )
